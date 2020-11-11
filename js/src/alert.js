@@ -88,16 +88,18 @@ class Alert {
   }
 
   _removeElement(element) {
-    $(element).removeClass(CLASS_NAME_SHOW)
+    const $element = $(element)
 
-    if (!$(element).hasClass(CLASS_NAME_FADE)) {
+    $element.removeClass(CLASS_NAME_SHOW)
+
+    if (!$element.hasClass(CLASS_NAME_FADE)) {
       this._destroyElement(element)
       return
     }
 
     const transitionDuration = Util.getTransitionDurationFromElement(element)
 
-    $(element)
+    $element
       .one(Util.TRANSITION_END, event => this._destroyElement(element, event))
       .emulateTransitionEnd(transitionDuration)
   }
