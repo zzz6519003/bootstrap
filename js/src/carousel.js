@@ -247,12 +247,14 @@ class Carousel {
   }
 
   _addEventListeners() {
+    const $element = $(this._element)
+
     if (this._config.keyboard) {
-      $(this._element).on(EVENT_KEYDOWN, event => this._keydown(event))
+      $element.on(EVENT_KEYDOWN, event => this._keydown(event))
     }
 
     if (this._config.pause === 'hover') {
-      $(this._element)
+      $element
         .on(EVENT_MOUSEENTER, event => this.pause(event))
         .on(EVENT_MOUSELEAVE, event => this.cycle(event))
     }
