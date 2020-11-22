@@ -95,9 +95,11 @@ const Util = {
       return 0
     }
 
+    const $element = $(element)
+
     // Get transition-duration of the element
-    let transitionDuration = $(element).css('transition-duration')
-    let transitionDelay = $(element).css('transition-delay')
+    let transitionDuration = $element.css('transition-duration')
+    let transitionDelay = $element.css('transition-delay')
 
     const floatTransitionDuration = parseFloat(transitionDuration)
     const floatTransitionDelay = parseFloat(transitionDelay)
