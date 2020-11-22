@@ -174,14 +174,15 @@ class Tooltip {
 
     if (event) {
       const dataKey = this.constructor.DATA_KEY
-      let context = $(event.currentTarget).data(dataKey)
+      const $currentTarget = $(event.currentTarget)
+      let context = $currentTarget.data(dataKey)
 
       if (!context) {
         context = new this.constructor(
           event.currentTarget,
           this._getDelegateConfig()
         )
-        $(event.currentTarget).data(dataKey, context)
+        $currentTarget.data(dataKey, context)
       }
 
       context._activeTrigger.click = !context._activeTrigger.click
@@ -206,8 +207,10 @@ class Tooltip {
 
     $.removeData(this.element, this.constructor.DATA_KEY)
 
-    $(this.element).off(this.constructor.EVENT_KEY)
-    $(this.element).closest('.modal').off('hide.bs.modal', this._hideModalHandler)
+    const $element = $(this.element)
+
+    $element.off(this.constructor.EVENT_KEY)
+    $element.closest('.modal').off('hide.bs.modal', this._hideModalHandler)
 
     if (this.tip) {
       $(this.tip).remove()
@@ -228,13 +231,15 @@ class Tooltip {
   }
 
   show() {
-    if ($(this.element).css('display') === 'none') {
+    const $element = $(this.element)
+
+    if ($element.css('display') === 'none') {
       throw new Error('Please use show on visible elements')
     }
 
     const showEvent = $.Event(this.constructor.Event.SHOW)
     if (this.isWithContent() && this._isEnabled) {
-      $(this.element).trigger(showEvent)
+      $element.trigger(showEvent)
 
       const shadowRoot = Util.findShadowRoot(this.element)
       const isInTheDom = $.contains(
@@ -247,6 +252,7 @@ class Tooltip {
       }
 
       const tip = this.getTipElement()
+      const $tip = $(tip)
       const tipId = Util.getUID(this.constructor.NAME)
 
       tip.setAttribute('id', tipId)
@@ -255,7 +261,7 @@ class Tooltip {
       this.setContent()
 
       if (this.config.animation) {
-        $(tip).addClass(CLASS_NAME_FADE)
+        $tip.addClass(CLASS_NAME_FADE)
       }
 
       const placement = typeof this.config.placement === 'function' ?
@@ -266,18 +272,18 @@ class Tooltip {
       this.addAttachmentClass(attachment)
 
       const container = this._getContainer()
-      $(tip).data(this.constructor.DATA_KEY, this)
+      $tip.data(this.constructor.DATA_KEY, this)
 
       if (!$.contains(this.element.ownerDocument.documentElement, this.tip)) {
-        $(tip).appendTo(container)
+        $tip.appendTo(container)
       }
 
-      $(this.element).trigger(this.constructor.Event.INSERTED)
+      $element.trigger(this.constructor.Event.INSERTED)
 
       this._popper = new Popper(this.element, tip, this._getPopperConfig(attachment))
 
-      $(tip).addClass(CLASS_NAME_SHOW)
-      $(tip).addClass(this.config.customClass)
+      $tip.addClass(CLASS_NAME_SHOW)
+      $tip.addClass(this.config.customClass)
 
       // If this is a touch-enabled device we add extra
       // empty mouseover listeners to the body's immediate children;
@@ -295,7 +301,7 @@ class Tooltip {
         const prevHoverState = this._hoverState
         this._hoverState = null
 
-        $(this.element).trigger(this.constructor.Event.SHOWN)
+        $element.trigger(this.constructor.Event.SHOWN)
 
         if (prevHoverState === HOVER_STATE_OUT) {
           this._leave(null, this)
@@ -317,6 +323,7 @@ class Tooltip {
   hide(callback) {
     const tip = this.getTipElement()
     const hideEvent = $.Event(this.constructor.Event.HIDE)
+    const $element = $(this.element)
     const complete = () => {
       if (this._hoverState !== HOVER_STATE_SHOW && tip.parentNode) {
         tip.parentNode.removeChild(tip)
@@ -324,7 +331,7 @@ class Tooltip {
 
       this._cleanTipClass()
       this.element.removeAttribute('aria-describedby')
-      $(this.element).trigger(this.constructor.Event.HIDDEN)
+      $element.trigger(this.constructor.Event.HIDDEN)
       if (this._popper !== null) {
         this._popper.destroy()
       }
@@ -334,7 +341,7 @@ class Tooltip {
       }
     }
 
-    $(this.element).trigger(hideEvent)
+    $element.trigger(hideEvent)
 
     if (hideEvent.isDefaultPrevented()) {
       return
@@ -394,12 +401,14 @@ class Tooltip {
   setElementContent($element, content) {
     if (typeof content === 'object' && (content.nodeType || content.jquery)) {
       // Content is a DOM node or a jQuery
+      const $content = $(content)
+
       if (this.config.html) {
-        if (!$(content).parent().is($element)) {
+        if (!$content.parent().is($element)) {
           $element.empty().append(content)
         }
       } else {
-        $element.text($(content).text())
+        $element.text($content.text())
       }
 
       return
@@ -495,10 +504,11 @@ class Tooltip {
 
   _setListeners() {
     const triggers = this.config.trigger.split(' ')
+    const $element = $(this.element)
 
     triggers.forEach(trigger => {
       if (trigger === 'click') {
-        $(this.element).on(
+        $element.on(
           this.constructor.Event.CLICK,
           this.config.selector,
           event => this.toggle(event)
@@ -511,7 +521,7 @@ class Tooltip {
           this.constructor.Event.MOUSELEAVE :
           this.constructor.Event.FOCUSOUT
 
-        $(this.element)
+        $element
           .on(eventIn, this.config.selector, event => this._enter(event))
           .on(eventOut, this.config.selector, event => this._leave(event))
       }
@@ -523,7 +533,7 @@ class Tooltip {
       }
     }
 
-    $(this.element).closest('.modal').on('hide.bs.modal', this._hideModalHandler)
+    $element.closest('.modal').on('hide.bs.modal', this._hideModalHandler)
 
     if (this.config.selector) {
       this.config = {
