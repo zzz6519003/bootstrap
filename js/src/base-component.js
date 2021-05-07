@@ -6,11 +6,9 @@
  */
 
 import Data from './dom/data'
-import {
-  executeAfterTransition,
-  getElement
-} from './util/index'
+import { executeAfterTransition, getElement } from './util/index'
 import EventHandler from './dom/event-handler'
+import Config from './util/config'
 
 /**
  * Constants
@@ -22,15 +20,17 @@ const VERSION = '5.1.3'
  * Class definition
  */
 
-class BaseComponent {
-  constructor(element) {
+class BaseComponent extends Config {
+  constructor(element, config) {
     element = getElement(element)
-
+    super()
     if (!element) {
       return
     }
 
     this._element = element
+    this._config = this._getConfig(config)
+
     Data.set(this._element, this.constructor.DATA_KEY, this)
   }
 
@@ -48,6 +48,13 @@ class BaseComponent {
     executeAfterTransition(callback, element, isAnimated)
   }
 
+  _getConfig(config) {
+    config = this._mergeConfigObj(config, this._element)
+    config = this._configAfterMerge(config)
+    this._typeCheckConfig(config)
+    return config
+  }
+
   // Static
   static getInstance(element) {
     return Data.get(getElement(element), this.DATA_KEY)
@@ -59,10 +66,6 @@ class BaseComponent {
 
   static get VERSION() {
     return VERSION
-  }
-
-  static get NAME() {
-    throw new Error('You have to implement the static method "NAME" for each component!')
   }
 
   static get DATA_KEY() {

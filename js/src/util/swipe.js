@@ -5,8 +5,9 @@
  * --------------------------------------------------------------------------
  */
 
+import Config from './config'
 import EventHandler from '../dom/event-handler'
-import { execute, typeCheckConfig } from './index'
+import { execute } from './index'
 
 /**
  * Constants
@@ -40,8 +41,9 @@ const DefaultType = {
  * Class definition
  */
 
-class Swipe {
+class Swipe extends Config {
   constructor(element, config) {
+    super()
     this._element = element
 
     if (!element || !Swipe.isSupported()) {
@@ -54,12 +56,24 @@ class Swipe {
     this._initEvents()
   }
 
+  static get NAME() {
+    return NAME
+  }
+
+  static get Default() {
+    return Default
+  }
+
   // Public
   dispose() {
     EventHandler.off(this._element, EVENT_KEY)
   }
 
   // Private
+  _getConfigDefaultType() {
+    return DefaultType
+  }
+
   _start(event) {
     if (!this._supportPointerEvents) {
       this._deltaX = event.touches[0].clientX
@@ -116,15 +130,6 @@ class Swipe {
       EventHandler.on(this._element, EVENT_TOUCHMOVE, event => this._move(event))
       EventHandler.on(this._element, EVENT_TOUCHEND, event => this._end(event))
     }
-  }
-
-  _getConfig(config) {
-    config = {
-      ...Default,
-      ...(typeof config === 'object' ? config : {})
-    }
-    typeCheckConfig(NAME, config, DefaultType)
-    return config
   }
 
   _eventIsPointerPenTouch(event) {

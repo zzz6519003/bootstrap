@@ -8,8 +8,7 @@
 import {
   defineJQueryPlugin,
   getElement,
-  getSelectorFromElement,
-  typeCheckConfig
+  getSelectorFromElement
 } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
@@ -62,9 +61,8 @@ const DefaultType = {
 
 class ScrollSpy extends BaseComponent {
   constructor(element, config) {
-    super(element)
+    super(element, config)
     this._scrollElement = this._element.tagName === 'BODY' ? window : this._element
-    this._config = this._getConfig(config)
     this._offsets = []
     this._targets = []
     this._activeTarget = null
@@ -135,16 +133,12 @@ class ScrollSpy extends BaseComponent {
   }
 
   // Private
-  _getConfig(config) {
-    config = {
-      ...Default,
-      ...Manipulator.getDataAttributes(this._element),
-      ...(typeof config === 'object' && config ? config : {})
-    }
+  _getConfigDefaultType() {
+    return DefaultType
+  }
 
+  _configAfterMerge(config) {
     config.target = getElement(config.target) || document.documentElement
-
-    typeCheckConfig(NAME, config, DefaultType)
 
     return config
   }
