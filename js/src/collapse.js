@@ -10,6 +10,7 @@ import {
   getElement,
   getElementFromSelector,
   getSelectorFromElement,
+  reflow,
   reflow
 } from './util/index'
 import EventHandler from './dom/event-handler'
