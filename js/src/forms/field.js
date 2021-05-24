@@ -12,7 +12,7 @@ const NAME = 'field'
 const CLASS_ERROR = 'invalid-feedback'
 const CLASS_INFO = 'info-feedback'
 const CLASS_SUCCESS = 'valid-feedback'
-const ARIA_DESCRIBED_BY = 'describedby'
+const ARIA_DESCRIBED_BY = 'aria-describedby'
 const Default = {
   name: null,
   parentForm: null,
