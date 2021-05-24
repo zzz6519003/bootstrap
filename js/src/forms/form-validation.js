@@ -78,7 +78,6 @@ class FormValidation extends BaseComponent {
 
       const field = new Field(element, {
         name: id,
-        parentForm: this._element
       })
       arrayFields.set(id, field)
     })

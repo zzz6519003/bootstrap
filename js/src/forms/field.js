@@ -15,7 +15,6 @@ const CLASS_SUCCESS = 'valid-feedback'
 const ARIA_DESCRIBED_BY = 'aria-describedby'
 const Default = {
   name: null,
-  parentForm: null,
   template: '<div class="field-feedback"></div>',
   valid: '',
   invalid: ''
@@ -23,7 +22,6 @@ const Default = {
 
 const DefaultType = {
   name: 'string',
-  parentForm: 'element',
   template: 'string',
   valid: 'string',
   invalid: 'string'
@@ -48,15 +46,9 @@ class Field {
       return
     }
 
-    if (this._appended.parentNode) {
-      this._appended.parentNode.removeChild(this._appended)
-      this._appended = null
-    }
-
-    const field = this._element
-    if (field) {
-      field.removeAttribute(ARIA_DESCRIBED_BY)
-    }
+    this._appended.remove()
+    this._appended = null
+    this._element.removeAttribute(ARIA_DESCRIBED_BY)
   }
 
   dispose() {
@@ -110,8 +102,7 @@ class Field {
 
   _append(text, classAttr) {
     this.clearAppended()
-    const field = this._element
-    if (!field) {
+    if (!text) {
       return
     }
 
@@ -119,9 +110,9 @@ class Field {
 
     this._appended = feedbackElement
 
-    field.parentNode.insertBefore(feedbackElement, field.nextSibling)
+    this._element.parentNode.insertBefore(feedbackElement, this._element.nextSibling)
 
-    field.setAttribute(ARIA_DESCRIBED_BY, feedbackElement.id)
+    this._element.setAttribute(ARIA_DESCRIBED_BY, feedbackElement.id)
   }
 
   _makeFeedbackElement(text, classAttr) {
