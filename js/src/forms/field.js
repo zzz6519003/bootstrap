@@ -9,19 +9,22 @@ import Messages from './messages'
 import Manipulator from '../dom/manipulator'
 
 const NAME = 'field'
-const CLASS_ERROR = 'invalid-feedback'
-const CLASS_INFO = 'info-feedback'
-const CLASS_SUCCESS = 'valid-feedback'
+const TYPE_PLACEHOLDER = '{type}'
+const CLASS_ERROR = `invalid-${TYPE_PLACEHOLDER}`
+const CLASS_INFO = `info-${TYPE_PLACEHOLDER}`
+const CLASS_SUCCESS = `valid-${TYPE_PLACEHOLDER}`
 const ARIA_DESCRIBED_BY = 'aria-describedby'
 const Default = {
   name: null,
-  template: '<div class="field-feedback"></div>',
-  valid: '',
-  invalid: ''
+  type: 'feedback', // or tooltip
+  template: `<div class="field-${TYPE_PLACEHOLDER}"></div>`,
+  valid: '', // valid message to add
+  invalid: '' // invalid message to add
 }
 
 const DefaultType = {
   name: 'string',
+  type: 'string',
   template: 'string',
   valid: 'string',
   invalid: 'string'
@@ -38,6 +41,7 @@ class Field {
     this._helpMessages = new Messages()
     this._successMessages = new Messages()
     this._config = this._getConfig(config)
+    this._messageId = this._element.getAttribute(ARIA_DESCRIBED_BY) || `${this._config.name}-formTip`
     this._appended = null
   }
 
@@ -100,13 +104,13 @@ class Field {
     return config
   }
 
-  _append(text, classAttr) {
+  _append(text, classPrefix) {
     this.clearAppended()
     if (!text) {
       return
     }
 
-    const feedbackElement = this._makeFeedbackElement(text, classAttr)
+    const feedbackElement = this._makeFeedbackElement(text, this._setProperClassType(classPrefix))
 
     this._appended = feedbackElement
 
@@ -117,17 +121,17 @@ class Field {
 
   _makeFeedbackElement(text, classAttr) {
     const element = document.createElement('div')
-    element.innerHTML = this._config.template
+    element.innerHTML = this._setProperClassType(this._config.template)
     const feedback = element.children[0]
     feedback.classList.add(classAttr)
-    feedback.id = this._getId()
+    feedback.id = this._messageId
     feedback.innerHTML = text
 
     return feedback
   }
 
-  _getId() {
-    return `${this._config.name}-formTip`
+  _setProperClassType(classPrefix) {
+    return classPrefix.replace(TYPE_PLACEHOLDER, this._config.type)
   }
 }
 

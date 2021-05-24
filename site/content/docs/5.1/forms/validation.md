@@ -269,54 +269,36 @@ Validation styles are available for the following form controls and components:
 If your form layout allows it, you can swap the `.{valid|invalid}-feedback` classes for `.{valid|invalid}-tooltip` classes to display validation feedback in a styled tooltip. Be sure to have a parent with `position: relative` on it for tooltip positioning. In the example below, our column classes have this already, but your project may require an alternative setup.
 
 {{< example >}}
-<form class="row g-3" data-bs-toggle="form-validation" novalidate>
+<form class="row g-3" data-bs-toggle="form-validation" data-bs-type="tooltip" >
   <div class="col-md-4 position-relative">
     <label for="validationTooltip01" class="form-label">First name</label>
-    <input type="text" class="form-control" id="validationTooltip01" value="Mark" required>
-    <div class="valid-tooltip">
-      Looks good!
-    </div>
+    <input type="text" class="form-control" id="validationTooltip01" value="Mark" required data-bs-valid="Looks good!">
   </div>
   <div class="col-md-4 position-relative">
     <label for="validationTooltip02" class="form-label">Last name</label>
-    <input type="text" class="form-control" id="validationTooltip02" value="Otto" required>
-    <div class="valid-tooltip">
-      Looks good!
-    </div>
+    <input type="text" class="form-control" id="validationTooltip02" value="Otto" required  data-bs-valid="Looks good!">
   </div>
   <div class="col-md-4 position-relative">
     <label for="validationTooltipUsername" class="form-label">Username</label>
     <div class="input-group has-validation">
       <span class="input-group-text" id="validationTooltipUsernamePrepend">@</span>
-      <input type="text" class="form-control" id="validationTooltipUsername" aria-describedby="validationTooltipUsernamePrepend" required>
-      <div class="invalid-tooltip">
-        Please choose a unique and valid username.
-      </div>
+      <input type="text" class="form-control" id="validationTooltipUsername" aria-describedby="validationTooltipUsernamePrepend" required data-bs-invalid="Please choose a username.">
     </div>
   </div>
   <div class="col-md-6 position-relative">
     <label for="validationTooltip03" class="form-label">City</label>
-    <input type="text" class="form-control" id="validationTooltip03" required>
-    <div class="invalid-tooltip">
-      Please provide a valid city.
-    </div>
+    <input type="text" class="form-control" id="validationTooltip03" required data-bs-invalid="Please provide a valid city.">
   </div>
   <div class="col-md-3 position-relative">
     <label for="validationTooltip04" class="form-label">State</label>
-    <select class="form-select" id="validationTooltip04" required>
+    <select class="form-select" id="validationTooltip04" required data-bs-invalid="Please select a valid state.">
       <option selected disabled value="">Choose...</option>
       <option>...</option>
     </select>
-    <div class="invalid-tooltip">
-      Please select a valid state.
-    </div>
   </div>
   <div class="col-md-3 position-relative">
     <label for="validationTooltip05" class="form-label">Zip</label>
-    <input type="text" class="form-control" id="validationTooltip05" required>
-    <div class="invalid-tooltip">
-      Please provide a valid zip.
-    </div>
+    <input type="text" class="form-control" id="validationTooltip05" required data-bs-invalid="Please provide a valid zip.">
   </div>
   <div class="col-12">
     <button class="btn btn-primary" type="submit">Submit form</button>
