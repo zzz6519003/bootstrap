@@ -12,6 +12,7 @@ const NAME = 'field'
 const CLASS_ERROR = 'invalid-feedback'
 const CLASS_INFO = 'info-feedback'
 const CLASS_SUCCESS = 'valid-feedback'
+const ARIA_DESCRIBED_BY = 'describedby'
 const Default = {
   name: null,
   parentForm: null,
@@ -54,7 +55,7 @@ class Field {
 
     const field = this._element
     if (field) {
-      field.removeAttribute('aria-descriebedby')
+      field.removeAttribute(ARIA_DESCRIBED_BY)
     }
   }
 
@@ -120,7 +121,7 @@ class Field {
 
     field.parentNode.insertBefore(feedbackElement, field.nextSibling)
 
-    field.setAttribute('aria-descriebedby', feedbackElement.id)
+    field.setAttribute(ARIA_DESCRIBED_BY, feedbackElement.id)
   }
 
   _makeFeedbackElement(text, classAttr) {
