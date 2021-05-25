@@ -9,17 +9,21 @@ import EventHandler from '../dom/event-handler'
 import { getUID, typeCheckConfig } from '../util/index'
 import Field from './field'
 import Manipulator from '../dom/manipulator'
+import SelectorEngine from '../dom/selector-engine'
 
 const NAME = 'formValidation'
 const DATA_KEY = 'bs.formValidation'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_SUBMIT = `submit${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_RESET = `reset${EVENT_KEY}`
 
 const CLASS_VALIDATED = 'was-validated'
 const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="form-validation"]'
 
 const Default = {
-  type: 'feedback'
+  type: 'feedback' // or 'tooltip'
 }
 
 const DefaultType = {
@@ -34,9 +38,10 @@ class FormValidation extends BaseComponent {
     }
 
     this._config = this._getConfig(config)
-    this._elements = [...this._element.elements]
 
-    this._formFields = this._initializeFields()
+    this._addEventListeners()
+    this._formElements = [...this._element.elements] // the DOM elements
+    this._formFields = null // Our fields
   }
 
   static get NAME() {
@@ -44,6 +49,10 @@ class FormValidation extends BaseComponent {
   }
 
   getFields() {
+    if (!this._formFields) {
+      this._formFields = this._initializeFields()
+    }
+
     return this._formFields
   }
 
@@ -65,13 +74,23 @@ class FormValidation extends BaseComponent {
   }
 
   autoValidate() {
-    this._elements.forEach(element => {
-      const field = this._formFields.get(element.id)
+    if (this._element.checkValidity()) {
+      this.clear()
+      return
+    }
+
+    this.getFields().forEach(field => {
+      const element = field.getElement()
       if (element.checkValidity()) {
         field.appendFirstSuccessMsg()
-      } else {
-        field.appendFirstErrorMsg()
+        return
       }
+
+      if (!field.errorMessages().has()) { // if hasn't custom message, try to put the default
+        field.errorMessages().add(element.validationMessage)
+      }
+
+      field.appendFirstErrorMsg()
     })
 
     this._element.classList.add(CLASS_VALIDATED)
@@ -88,9 +107,15 @@ class FormValidation extends BaseComponent {
     return config
   }
 
+  _addEventListeners() {
+    EventHandler.on(this._element, EVENT_RESET, () => {
+      this.clear()
+    })
+  }
+
   _initializeFields() {
     const arrayFields = new Map()
-    this._elements.forEach(element => {
+    this._formElements.forEach(element => {
       let { id } = element
       if (!id) {
         id = getUID(NAME)
@@ -107,20 +132,21 @@ class FormValidation extends BaseComponent {
   }
 }
 
-EventHandler.on(document, `submit${EVENT_KEY}${DATA_API_KEY}`, SELECTOR_DATA_TOGGLE, event => {
+EventHandler.on(document, EVENT_SUBMIT, SELECTOR_DATA_TOGGLE, event => {
   const { target } = event
-  target.setAttribute('novalidate', true)
   const data = FormValidation.getInstance(target) || new FormValidation(target)
-  if (target.checkValidity()) {
-    data.clear()
-    return
+  if (!target.checkValidity()) {
+    event.preventDefault()
+    event.stopPropagation()
   }
-
-  event.preventDefault()
-  event.stopPropagation()
 
   data.autoValidate()
 })
 
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  SelectorEngine.find(SELECTOR_DATA_TOGGLE).forEach(el => {
+    el.setAttribute('novalidate', true)
+  })
+})
 export default FormValidation
 

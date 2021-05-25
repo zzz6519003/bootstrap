@@ -41,8 +41,12 @@ class Field {
     this._helpMessages = new Messages()
     this._successMessages = new Messages()
     this._config = this._getConfig(config)
-    this._messageId = this._element.getAttribute(ARIA_DESCRIBED_BY) || `${this._config.name}-formTip`
+    this._initialDescriptedBy = this._element.getAttribute(ARIA_DESCRIBED_BY)
     this._appended = null
+  }
+
+  getElement() {
+    return this._element
   }
 
   clearAppended() {
@@ -52,7 +56,11 @@ class Field {
 
     this._appended.remove()
     this._appended = null
-    this._element.removeAttribute(ARIA_DESCRIBED_BY)
+    if (this._initialDescriptedBy) {
+      this._element.setAttribute(ARIA_DESCRIBED_BY, this._initialDescriptedBy)
+    } else {
+      this._element.removeAttribute(ARIA_DESCRIBED_BY)
+    }
   }
 
   dispose() {
@@ -74,15 +82,15 @@ class Field {
   }
 
   appendFirstErrorMsg() {
-    return this._append(this.errorMessages().getFirst(), CLASS_ERROR)
+    return this.appendFeedback(this.errorMessages().getFirst(), CLASS_ERROR)
   }
 
   appendFirstHelpMsg() {
-    return this._append(this.helpMessages().getFirst(), CLASS_INFO)
+    return this.appendFeedback(this.helpMessages().getFirst(), CLASS_INFO)
   }
 
   appendFirstSuccessMsg() {
-    return this._append(this.successMessages().getFirst(), CLASS_SUCCESS)
+    return this.appendFeedback(this.successMessages().getFirst(), CLASS_SUCCESS)
   }
 
   _getConfig(config) {
@@ -104,34 +112,39 @@ class Field {
     return config
   }
 
-  _append(text, classPrefix) {
+  appendFeedback(text, classAttr = '') {
     this.clearAppended()
     if (!text) {
       return
     }
 
-    const feedbackElement = this._makeFeedbackElement(text, this._setProperClassType(classPrefix))
+    const feedbackElement = this._makeFeedbackElement(text, classAttr)
 
     this._appended = feedbackElement
 
     this._element.parentNode.insertBefore(feedbackElement, this._element.nextSibling)
 
-    this._element.setAttribute(ARIA_DESCRIBED_BY, feedbackElement.id)
+    const describedBy = this._initialDescriptedBy ? `${this._initialDescriptedBy} ` : ''
+    this._element.setAttribute(ARIA_DESCRIBED_BY, `${describedBy}${feedbackElement.id}`)
   }
 
   _makeFeedbackElement(text, classAttr) {
     const element = document.createElement('div')
     element.innerHTML = this._setProperClassType(this._config.template)
     const feedback = element.children[0]
-    feedback.classList.add(classAttr)
-    feedback.id = this._messageId
+    feedback.classList.add(this._setProperClassType(classAttr))
+    feedback.id = this._getId()
     feedback.innerHTML = text
 
     return feedback
   }
 
   _setProperClassType(classPrefix) {
-    return classPrefix.replace(TYPE_PLACEHOLDER, this._config.type)
+    return classPrefix.replaceAll(TYPE_PLACEHOLDER, this._config.type)
+  }
+
+  _getId() {
+    return `${this._config.name}-formTip`
   }
 }
 

@@ -27,15 +27,15 @@ With that in mind, consider the following demos for our custom form validation s
 
 ## Custom styles
 
-For custom Bootstrap form validation messages, you'll need to add the `novalidate` boolean attribute to your `<form>`. This disables the browser default feedback tooltips, but still provides access to the form validation APIs in JavaScript. Try to submit the form below; our JavaScript will intercept the submit button and relay feedback to you. When attempting to submit, you'll see the `:invalid` and `:valid` styles applied to your form controls.
+For custom Bootstrap form validation messages, you'll need to add the data-bs-toggle="form-validation" `<form>`. This disables the browser default feedback tooltips, but still provides access to the form validation APIs in JavaScript. Try to submit the form below; our JavaScript will intercept the submit button and relay feedback to you. When attempting to submit, you'll see the `:invalid` and `:valid` styles applied to your form controls.
 
 Custom feedback styles apply custom colors, borders, focus styles, and background icons to better communicate feedback. Background icons for `<select>`s are only available with `.form-select`, and not `.form-control`.
 
 {{< example >}}
-<form class="row g-3" data-bs-toggle="form-validation" novalidate>
+<form class="row g-3" data-bs-toggle="form-validation">
   <div class="col-md-4">
     <label for="validationCustom01" class="form-label">First name</label>
-    <input type="text" class="form-control" id="validationCustom01" value="Mark" required data-bs-valid="Looks good!">
+    <input type="text" class="form-control" id="validationCustom01" value="Mark" required data-bs-valid="Looks good!" data-bs-invalid="Please, provide a valid Name!">
   </div>
   <div class="col-md-4">
     <label for="validationCustom02" class="form-label">Last name</label>
@@ -73,6 +73,7 @@ Custom feedback styles apply custom colors, borders, focus styles, and backgroun
   </div>
   <div class="col-12">
     <button class="btn btn-primary" type="submit">Submit form</button>
+    <button class="btn btn-danger" type="reset">Reset form</button>
   </div>
 </form>
 {{< /example >}}
