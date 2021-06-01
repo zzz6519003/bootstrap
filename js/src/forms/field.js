@@ -10,14 +10,13 @@ import Manipulator from '../dom/manipulator'
 
 const NAME = 'field'
 const TYPE_PLACEHOLDER = '{type}'
-const CLASS_ERROR = `invalid-${TYPE_PLACEHOLDER}`
-const CLASS_INFO = `info-${TYPE_PLACEHOLDER}`
-const CLASS_SUCCESS = `valid-${TYPE_PLACEHOLDER}`
+const CLASS_PREFIX_ERROR = 'invalid'
+const CLASS_PREFIX_INFO = 'info'
+const CLASS_PREFIX_SUCCESS = 'valid'
 const ARIA_DESCRIBED_BY = 'aria-describedby'
 const Default = {
   name: null,
   type: 'feedback', // or tooltip
-  template: `<div class="field-${TYPE_PLACEHOLDER}"></div>`,
   valid: '', // valid message to add
   invalid: '' // invalid message to add
 }
@@ -25,7 +24,6 @@ const Default = {
 const DefaultType = {
   name: 'string',
   type: 'string',
-  template: 'string',
   valid: 'string',
   invalid: 'string'
 }
@@ -37,9 +35,9 @@ class Field {
       throw new TypeError(`field with id:${this._config.name} not found`)
     }
 
-    this._errorMessages = new Messages()
-    this._helpMessages = new Messages()
-    this._successMessages = new Messages()
+    this._errorMessages = new Messages(CLASS_PREFIX_ERROR)
+    this._helpMessages = new Messages(CLASS_PREFIX_INFO)
+    this._successMessages = new Messages(CLASS_PREFIX_SUCCESS)
     this._config = this._getConfig(config)
     this._initialDescriptedBy = this._element.getAttribute(ARIA_DESCRIBED_BY)
     this._appended = null
@@ -83,10 +81,6 @@ class Field {
 
   appendFirstErrorMsg() {
     return this.appendFeedback(this.errorMessages().getFirst(), CLASS_ERROR)
-  }
-
-  appendFirstHelpMsg() {
-    return this.appendFeedback(this.helpMessages().getFirst(), CLASS_INFO)
   }
 
   appendFirstSuccessMsg() {
