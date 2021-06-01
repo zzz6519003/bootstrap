@@ -9,7 +9,6 @@ import Messages from './messages'
 import Manipulator from '../dom/manipulator'
 
 const NAME = 'field'
-const TYPE_PLACEHOLDER = '{type}'
 const CLASS_PREFIX_ERROR = 'invalid'
 const CLASS_PREFIX_INFO = 'info'
 const CLASS_PREFIX_SUCCESS = 'valid'
@@ -35,12 +34,15 @@ class Field {
       throw new TypeError(`field with id:${this._config.name} not found`)
     }
 
-    this._errorMessages = new Messages(CLASS_PREFIX_ERROR)
-    this._helpMessages = new Messages(CLASS_PREFIX_INFO)
-    this._successMessages = new Messages(CLASS_PREFIX_SUCCESS)
     this._config = this._getConfig(config)
+
+    this._errorMessages = this._getNewMessagesCollection(CLASS_PREFIX_ERROR)
+    this._helpMessages = this._getNewMessagesCollection(CLASS_PREFIX_INFO)
+    this._successMessages = this._getNewMessagesCollection(CLASS_PREFIX_SUCCESS)
+
+    this._initializeMessageCollections()
     this._initialDescriptedBy = this._element.getAttribute(ARIA_DESCRIBED_BY)
-    this._appended = null
+    this._appendedFeedback = null
   }
 
   getElement() {
@@ -48,12 +50,12 @@ class Field {
   }
 
   clearAppended() {
-    if (!this._appended) {
+    if (!this._appendedFeedback) {
       return
     }
 
-    this._appended.remove()
-    this._appended = null
+    this._appendedFeedback.remove()
+    this._appendedFeedback = null
     if (this._initialDescriptedBy) {
       this._element.setAttribute(ARIA_DESCRIBED_BY, this._initialDescriptedBy)
     } else {
@@ -79,14 +81,6 @@ class Field {
     return this._successMessages
   }
 
-  appendFirstErrorMsg() {
-    return this.appendFeedback(this.errorMessages().getFirst(), CLASS_ERROR)
-  }
-
-  appendFirstSuccessMsg() {
-    return this.appendFeedback(this.successMessages().getFirst(), CLASS_SUCCESS)
-  }
-
   _getConfig(config) {
     config = {
       ...Default,
@@ -94,51 +88,47 @@ class Field {
       ...(typeof config === 'object' ? config : {})
     }
 
-    if (config.invalid) {
-      this.errorMessages().add(config.invalid)
-    }
-
-    if (config.valid) {
-      this.successMessages().add(config.valid)
-    }
-
     typeCheckConfig(NAME, config, DefaultType)
     return config
   }
 
-  appendFeedback(text, classAttr = '') {
+  _appendFeedback(htmlElement) {
     this.clearAppended()
-    if (!text) {
+    if (!htmlElement) {
       return
     }
 
-    const feedbackElement = this._makeFeedbackElement(text, classAttr)
+    const feedbackElement = htmlElement
 
-    this._appended = feedbackElement
+    this._appendedFeedback = feedbackElement
 
     this._element.parentNode.insertBefore(feedbackElement, this._element.nextSibling)
-
+    feedbackElement.id = this._getId()
     const describedBy = this._initialDescriptedBy ? `${this._initialDescriptedBy} ` : ''
     this._element.setAttribute(ARIA_DESCRIBED_BY, `${describedBy}${feedbackElement.id}`)
   }
 
-  _makeFeedbackElement(text, classAttr) {
-    const element = document.createElement('div')
-    element.innerHTML = this._setProperClassType(this._config.template)
-    const feedback = element.children[0]
-    feedback.classList.add(this._setProperClassType(classAttr))
-    feedback.id = this._getId()
-    feedback.innerHTML = text
-
-    return feedback
-  }
-
-  _setProperClassType(classPrefix) {
-    return classPrefix.replaceAll(TYPE_PLACEHOLDER, this._config.type)
-  }
-
   _getId() {
     return `${this._config.name}-formTip`
+  }
+
+  _getNewMessagesCollection(classPrefix) {
+    const config = {
+      appendFunction: html => this._appendFeedback(html),
+      type: this._config.type,
+      classPrefix
+    }
+    return new Messages(config)
+  }
+
+  _initializeMessageCollections() {
+    if (this._config.invalid) {
+      this.errorMessages().add(this._config.invalid)
+    }
+
+    if (this._config.valid) {
+      this.successMessages().add(this._config.valid)
+    }
   }
 }
 

@@ -1,19 +1,20 @@
-import { sanitizeHtml, DefaultAllowlist } from '../util/sanitizer'
-
 /**
  * --------------------------------------------------------------------------
  * Bootstrap (v5.0.1): util/messages.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * --------------------------------------------------------------------------
  */
+import Message from './message'
 
 class Messages {
-  constructor() {
+  constructor(messageConfig) {
+    this._messageConfig = messageConfig
     this._messages = new Set()
   }
 
   add(message) {
-    this._messages.add(sanitizeHtml(message, DefaultAllowlist, null))
+    const config = { ...this._messageConfig, ...{ text: message } }
+    this._messages.add(new Message(config))
   }
 
   has() {
@@ -25,11 +26,22 @@ class Messages {
   }
 
   getAll() {
-    return [...this._messages]
+    return this._getAllMessagesAsArray().map(message => message.getText())
   }
 
   getFirst() {
-    return this.getAll()[0] || null
+    return this._getAllMessagesAsArray()[0] || null
+  }
+
+  appendFirst() {
+    const message = this.getFirst()
+    if (message) {
+      message.append()
+    }
+  }
+
+  _getAllMessagesAsArray() {
+    return [...this._messages]
   }
 }
 

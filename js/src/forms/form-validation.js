@@ -62,7 +62,7 @@ class FormValidation extends BaseComponent {
 
   appendErrors() {
     this.getFields().forEach(field => {
-      field.appendFirstErrorMsg()
+      field.errorMessages().appendFirst()
     })
   }
 
@@ -82,7 +82,7 @@ class FormValidation extends BaseComponent {
     this.getFields().forEach(field => {
       const element = field.getElement()
       if (element.checkValidity()) {
-        field.appendFirstSuccessMsg()
+        field.successMessages().appendFirst()
         return
       }
 
@@ -90,7 +90,7 @@ class FormValidation extends BaseComponent {
         field.errorMessages().add(element.validationMessage)
       }
 
-      field.appendFirstErrorMsg()
+      field.errorMessages().appendFirst()
     })
 
     this._element.classList.add(CLASS_VALIDATED)

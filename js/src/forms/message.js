@@ -1,9 +1,9 @@
 import { DefaultAllowlist, sanitizeHtml } from '../util/sanitizer'
-import { typeCheckConfig } from '../util'
+import { typeCheckConfig } from '../util/index'
 
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.0.1): util/messages.js
+ * Bootstrap (v5.0.1): util/message.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * --------------------------------------------------------------------------
  */
@@ -11,17 +11,19 @@ import { typeCheckConfig } from '../util'
 const TYPE_PLACEHOLDER = '{type}'
 
 const Default = {
-  message: '',
-  template: `<div class="field-${TYPE_PLACEHOLDER}"></div>`,
   appendFunction: null,
-  clearFunction: null
+  classPrefix: null,
+  template: `<div class="field-${TYPE_PLACEHOLDER}"></div>`,
+  text: null,
+  type: null
 }
 
 const DefaultType = {
-  message: 'string',
   appendFunction: 'function',
-  clearFunction: 'function',
-  template: 'string'
+  classPrefix: 'string',
+  template: 'string',
+  text: 'string',
+  type: 'string'
 }
 
 class Message {
@@ -33,12 +35,23 @@ class Message {
     return this._config.message
   }
 
-  append() {
-    this._config.appendFunction()
+  getHtml() {
+    const element = document.createElement('div')
+    element.innerHTML = this._setProperClassType(this._config.template)
+    const feedback = element.children[0]
+    const className = `${this._config.classPrefix}-${TYPE_PLACEHOLDER}`
+    feedback.classList.add(this._setProperClassType(className))
+    feedback.innerHTML = this._config.text
+
+    return feedback
   }
 
-  clear() {
-    this._config.clearFunction()
+  append() {
+    this._config.appendFunction(this.getHtml())
+  }
+
+  _setProperClassType(classPrefix) {
+    return classPrefix.replaceAll(TYPE_PLACEHOLDER, this._config.type)
   }
 
   _getConfig(config) {
@@ -46,8 +59,8 @@ class Message {
       ...Default,
       ...(typeof config === 'object' ? config : {})
     }
+    config.text = sanitizeHtml(config.text, DefaultAllowlist, null)
     typeCheckConfig(Message, config, DefaultType)
-    config.message = sanitizeHtml(config.message, DefaultAllowlist, null)
     return config
   }
 }
