@@ -241,7 +241,6 @@ class Toast extends BaseComponent {
     if (time) {
       progressBarElement.classList.add('animated')
       progressBarElement.style.animationDuration = `${time}ms`
-      // reflow(progressBarElement)
       return
     }
 
