@@ -73,13 +73,8 @@ class Tab {
       previous = previous[previous.length - 1]
     }
 
-    const hideEvent = $.Event(EVENT_HIDE, {
-      relatedTarget: this._element
-    })
-
-    const showEvent = $.Event(EVENT_SHOW, {
-      relatedTarget: previous
-    })
+    const hideEvent = $.Event(EVENT_HIDE, { relatedTarget: this._element })
+    const showEvent = $.Event(EVENT_SHOW, { relatedTarget: previous })
 
     if (previous) {
       $(previous).trigger(hideEvent)
@@ -102,13 +97,8 @@ class Tab {
     )
 
     const complete = () => {
-      const hiddenEvent = $.Event(EVENT_HIDDEN, {
-        relatedTarget: this._element
-      })
-
-      const shownEvent = $.Event(EVENT_SHOWN, {
-        relatedTarget: previous
-      })
+      const hiddenEvent = $.Event(EVENT_HIDDEN, { relatedTarget: this._element })
+      const shownEvent = $.Event(EVENT_SHOWN, { relatedTarget: previous })
 
       $(previous).trigger(hiddenEvent)
       $(this._element).trigger(shownEvent)

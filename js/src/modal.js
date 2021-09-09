@@ -98,9 +98,7 @@ class Modal {
       return
     }
 
-    const showEvent = $.Event(EVENT_SHOW, {
-      relatedTarget
-    })
+    const showEvent = $.Event(EVENT_SHOW, { relatedTarget })
 
     $(this._element).trigger(showEvent)
 
@@ -122,11 +120,7 @@ class Modal {
     this._setEscapeEvent()
     this._setResizeEvent()
 
-    $(this._element).on(
-      EVENT_CLICK_DISMISS,
-      SELECTOR_DATA_DISMISS,
-      event => this.hide(event)
-    )
+    $(this._element).on(EVENT_CLICK_DISMISS, SELECTOR_DATA_DISMISS, event => this.hide(event))
 
     $(this._dialog).on(EVENT_MOUSEDOWN_DISMISS, () => {
       $(this._element).one(EVENT_MOUSEUP_DISMISS, event => {
@@ -260,8 +254,7 @@ class Modal {
     const transition = $(this._element).hasClass(CLASS_NAME_FADE)
     const modalBody = this._dialog ? this._dialog.querySelector(SELECTOR_MODAL_BODY) : null
 
-    if (!this._element.parentNode ||
-        this._element.parentNode.nodeType !== Node.ELEMENT_NODE) {
+    if (!this._element.parentNode || this._element.parentNode.nodeType !== Node.ELEMENT_NODE) {
       // Don't move modal's DOM position
       document.body.appendChild(this._element)
     }
@@ -287,9 +280,7 @@ class Modal {
       this._enforceFocus()
     }
 
-    const shownEvent = $.Event(EVENT_SHOWN, {
-      relatedTarget
-    })
+    const shownEvent = $.Event(EVENT_SHOWN, { relatedTarget })
 
     const transitionComplete = () => {
       if (this._config.focus) {
