@@ -159,7 +159,7 @@ class Carousel extends BaseComponent {
       this._interval = null
     }
 
-    if (this._config && this._config.interval && !this._isPaused) {
+    if (this._config.interval && !this._isPaused) {
       this._updateInterval()
 
       this._interval = setInterval(
@@ -211,6 +211,7 @@ class Carousel extends BaseComponent {
       ...(typeof config === 'object' ? config : {})
     }
     typeCheckConfig(NAME, config, DefaultType)
+    config.defaultInterval = config.interval
     return config
   }
 
@@ -326,12 +327,7 @@ class Carousel extends BaseComponent {
 
     const elementInterval = Manipulator.getDataAttribute(element, 'interval')
 
-    if (elementInterval) {
-      this._config.defaultInterval = this._config.defaultInterval || this._config.interval
-      this._config.interval = elementInterval
-    } else {
-      this._config.interval = this._config.defaultInterval || this._config.interval
-    }
+    this._config.interval = elementInterval || this._config.defaultInterval
   }
 
   _slide(directionOrOrder, element) {
