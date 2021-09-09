@@ -162,10 +162,7 @@ class Carousel extends BaseComponent {
     if (this._config.interval && !this._isPaused) {
       this._updateInterval()
 
-      this._interval = setInterval(
-        (document.visibilityState ? this.nextWhenVisible : this.next).bind(this),
-        this._config.interval
-      )
+      this._interval = setInterval((this.nextWhenVisible).bind(this), this._config.interval)
     }
   }
 
