@@ -450,8 +450,6 @@ class Carousel extends BaseComponent {
       }
     }
 
-    const action = typeof config === 'string' ? config : _config.slide
-
     if (typeof config === 'number') {
       data.to(config)
       return
@@ -477,39 +475,42 @@ class Carousel extends BaseComponent {
       Carousel.carouselInterface(this, config)
     })
   }
-
-  static dataApiClickHandler(event) {
-    const target = getElementFromSelector(this)
-
-    if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {
-      return
-    }
-
-    const config = {
-      ...Manipulator.getDataAttributes(this)
-    }
-    const slideIndex = Manipulator.getDataAttribute(this, 'slide-to')
-
-    if (slideIndex) {
-      config.interval = 0
-    }
-
-    Carousel.carouselInterface(target, config)
-
-    if (slideIndex) {
-      Carousel.getInstance(target).to(slideIndex)
-    }
-
-    event.preventDefault()
-  }
 }
+
+/**
+ * ------------------------------------------------------------------------
+ * Data Api implementation
+ * ------------------------------------------------------------------------
+ */
+
+EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_SLIDE, function (event) {
+  const target = getElementFromSelector(this)
+
+  if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {
+    return
+  }
+
+  event.preventDefault()
+
+  const carousel = Carousel.getOrCreateInstance(target)
+
+  const slideIndex = Manipulator.getDataAttribute(this, 'slide-to')
+  if (slideIndex) {
+    carousel.to(slideIndex)
+    return
+  }
+
+  if (Manipulator.getDataAttribute(this, 'slide') === 'next') {
+    carousel.next()
+    return
+  }
+
+  carousel.prev()
+})
 
 /**
  * Data API implementation
  */
-
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_SLIDE, Carousel.dataApiClickHandler)
-
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   const carousels = SelectorEngine.find(SELECTOR_DATA_RIDE)
 
