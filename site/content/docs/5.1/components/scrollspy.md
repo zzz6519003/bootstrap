@@ -8,6 +8,23 @@ toc: true
 
 ## How it works
 
+<nav id="rr" class="navbar">
+  <ul class="nav nav-pills">
+    <li class="nav-item"><a id="li-100-1" class="nav-link" href="#div-100-1">div 1</a></li>
+    <li class="nav-item"><a id="li-100-2" class="nav-link" href="#div-100-2">div 2</a></li>
+    <li class="nav-item"><a id="li-100-3" class="nav-link" href="#div-100-3">div 3</a></li>
+    <li class="nav-item"><a id="li-100-4" class="nav-link" href="#div-100-4">div 4</a></li>
+    <li class="nav-item"><a id="li-100-5" class="nav-link" href="#div-100-5">div 5</a></li>
+  </ul>
+</nav>
+<div id="tt" class="content" style="overflow: auto; position: relative; height: 100px">
+  <div id="div-100-1" style="background: red; position: relative; height: 98%; padding: 0; margin: 1%">div 1</div>
+  <div id="div-100-2" style="background: yellow; position: relative; height: 98%; padding: 0; margin: 1%">div 2</div>
+  <div id="div-100-3" style="background: red; position: relative; height: 98%; padding: 0; margin: 1%">div 3</div>
+  <div id="div-100-4" style="background: yellow; position: relative; height: 98%; padding: 0; margin: 1%">div 4</div>
+  <div id="div-100-5" style="background: red; position: relative; height: 98%; padding: 0; margin: 1%">div 5</div>
+</div>
+
 Scrollspy has a few requirements to function properly:
 
 - It toggles `.active` class on anchor elements, so is handy to be used on a Bootstrap [nav component]({{< docsref "/components/navs-tabs" >}}) or [list group]({{< docsref "/components/list-group" >}}).

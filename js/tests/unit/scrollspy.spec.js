@@ -49,7 +49,6 @@ describe('ScrollSpy', () => {
     const scrollHeight = (target.offsetTop - parentOffset) + paddingTop
 
     contentEl.addEventListener('activate.bs.scrollspy', event => {
-
       if (scrollSpy._activeTarget !== element) {
         return
       }
@@ -468,8 +467,8 @@ describe('ScrollSpy', () => {
         cb: () => {
           scrollTo(contentEl, 0)
           testElementIsActiveAfterScroll({
-            elementSelector: '#li-100-4',
-            targetSelector: '#div-100-4',
+            elementSelector: '#li-100-2',
+            targetSelector: '#div-100-2',
             contentEl,
             scrollSpy,
             cb: () => {
