@@ -1,5 +1,4 @@
 import ScrollSpy from '../../src/scrollspy'
-import Manipulator from '../../src/dom/manipulator'
 
 /** Test helpers */
 import { clearFixture, createEvent, getFixture, jQueryMock } from '../helpers/fixture'
@@ -221,7 +220,7 @@ describe('ScrollSpy', () => {
       const contentEl = fixtureEl.querySelector('#content')
       const scrollSpy = new ScrollSpy(fixtureEl, {
         target: '#navigation',
-        offset: Manipulator.position(contentEl).top
+        offset: contentEl.offsetTop
       })
 
       spyOn(scrollSpy, '_process').and.callThrough()
