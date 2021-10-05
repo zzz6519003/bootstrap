@@ -741,11 +741,8 @@ describe('Tab', () => {
       const tabProfileEl = fixtureEl.querySelector('#profile')
       const tabHomeEl = fixtureEl.querySelector('#home')
 
-      triggerTabProfileEl.addEventListener('shown.bs.tab', () => {
-        expect(tabProfileEl.classList.contains('fade')).toEqual(true)
-        expect(tabProfileEl.classList.contains('show')).toEqual(true)
-
-        triggerTabHomeEl.addEventListener('shown.bs.tab', () => {
+      triggerTabHomeEl.addEventListener('shown.bs.tab', () => {
+        setTimeout(() => {
           expect(tabProfileEl.classList.contains('fade')).toEqual(true)
           expect(tabProfileEl.classList.contains('show')).toEqual(false)
 
@@ -753,15 +750,21 @@ describe('Tab', () => {
           expect(tabHomeEl.classList.contains('show')).toEqual(true)
 
           done()
-        })
+        }, 10)
+      })
 
-        triggerTabHomeEl.click()
+      triggerTabProfileEl.addEventListener('shown.bs.tab', () => {
+        setTimeout(() => {
+          expect(tabProfileEl.classList.contains('fade')).toEqual(true)
+          expect(tabProfileEl.classList.contains('show')).toEqual(true)
+          triggerTabHomeEl.click()
+        }, 10)
       })
 
       triggerTabProfileEl.click()
     })
 
-    it('should not add show class to tab panes if there is no `.fade` class', done => {
+    it('should not add `show` class to tab panes if there is no `.fade` class', done => {
       fixtureEl.innerHTML = [
         '<ul class="nav nav-tabs" role="tablist">',
         '  <li class="nav-item" role="presentation">',
@@ -806,8 +809,10 @@ describe('Tab', () => {
       const secondNavEl = fixtureEl.querySelector('#secondNav')
 
       secondNavEl.addEventListener('shown.bs.tab', () => {
-        expect(fixtureEl.querySelectorAll('.show').length).toEqual(1)
-        done()
+        setTimeout(() => {
+          expect(fixtureEl.querySelectorAll('.show').length).toEqual(1)
+          done()
+        }, 10)
       })
 
       secondNavEl.click()
