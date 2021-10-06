@@ -2,9 +2,13 @@ name: JS Tests
 
 on:
   push:
-    branches-ignore:
-      - "dependabot/**"
+    branches:
+      - main
+      - v4-dev
+      - "!dependabot/**"
   pull_request:
+    paths:
+      - '**.js'
 
 env:
   FORCE_COLOR: 2

@@ -2,9 +2,14 @@ name: CSS (node-sass)
 
 on:
   push:
-    branches-ignore:
-      - "dependabot/**"
+    branches:
+      - main
+      - v4-dev
+      - "!dependabot/**"
   pull_request:
+    paths:
+      - '**.scss'
+
 
 env:
   FORCE_COLOR: 2
