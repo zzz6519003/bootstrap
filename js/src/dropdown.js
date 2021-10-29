@@ -138,8 +138,8 @@ class Dropdown extends BaseComponent {
     // only needed because of broken event delegation on iOS
     // https://www.quirksmode.org/blog/archives/2014/02/mouse_event_bub.html
     if ('ontouchstart' in document.documentElement && !parent.closest(SELECTOR_NAVBAR_NAV)) {
-      for (const elem of [].concat(...document.body.children)) {
-        EventHandler.on(elem, 'mouseover', noop)
+      for (const element of [].concat(...document.body.children)) {
+        EventHandler.on(element, 'mouseover', noop)
       }
     }
 
@@ -188,8 +188,8 @@ class Dropdown extends BaseComponent {
     // If this is a touch-enabled device we remove the extra
     // empty mouseover listeners we added for iOS support
     if ('ontouchstart' in document.documentElement) {
-      for (const elem of [].concat(...document.body.children)) {
-        EventHandler.off(elem, 'mouseover', noop)
+      for (const element of [].concat(...document.body.children)) {
+        EventHandler.off(element, 'mouseover', noop)
       }
     }
 
@@ -279,7 +279,7 @@ class Dropdown extends BaseComponent {
     const { offset } = this._config
 
     if (typeof offset === 'string') {
-      return offset.split(',').map(val => Number.parseInt(val, 10))
+      return offset.split(',').map(value => Number.parseInt(value, 10))
     }
 
     if (typeof offset === 'function') {
@@ -322,7 +322,7 @@ class Dropdown extends BaseComponent {
   }
 
   _selectMenuItem({ key, target }) {
-    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(el => isVisible(el))
+    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
       return

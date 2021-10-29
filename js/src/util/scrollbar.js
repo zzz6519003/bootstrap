@@ -59,36 +59,36 @@ class ScrollBarHelper {
     this._element.style.overflow = 'hidden'
   }
 
-  _setElementAttributes(selector, styleProp, callback) {
+  _setElementAttributes(selector, styleProperty, callback) {
     const scrollbarWidth = this.getWidth()
     const manipulationCallBack = element => {
       if (element !== this._element && window.innerWidth > element.clientWidth + scrollbarWidth) {
         return
       }
 
-      this._saveInitialAttribute(element, styleProp)
-      const calculatedValue = window.getComputedStyle(element)[styleProp]
-      element.style[styleProp] = `${callback(Number.parseFloat(calculatedValue))}px`
+      this._saveInitialAttribute(element, styleProperty)
+      const calculatedValue = window.getComputedStyle(element)[styleProperty]
+      element.style[styleProperty] = `${callback(Number.parseFloat(calculatedValue))}px`
     }
 
     this._applyManipulationCallback(selector, manipulationCallBack)
   }
 
-  _saveInitialAttribute(element, styleProp) {
-    const actualValue = element.style[styleProp]
+  _saveInitialAttribute(element, styleProperty) {
+    const actualValue = element.style[styleProperty]
     if (actualValue) {
-      Manipulator.setDataAttribute(element, styleProp, actualValue)
+      Manipulator.setDataAttribute(element, styleProperty, actualValue)
     }
   }
 
-  _resetElementAttributes(selector, styleProp) {
+  _resetElementAttributes(selector, styleProperty) {
     const manipulationCallBack = element => {
-      const value = Manipulator.getDataAttribute(element, styleProp)
+      const value = Manipulator.getDataAttribute(element, styleProperty)
       if (typeof value === 'undefined') {
-        element.style.removeProperty(styleProp)
+        element.style.removeProperty(styleProperty)
       } else {
-        Manipulator.removeDataAttribute(element, styleProp)
-        element.style[styleProp] = value
+        Manipulator.removeDataAttribute(element, styleProperty)
+        element.style[styleProperty] = value
       }
     }
 

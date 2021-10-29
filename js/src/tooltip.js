@@ -256,12 +256,12 @@ class Tooltip extends BaseComponent {
     }
 
     const complete = () => {
-      const prevHoverState = this._isHovered
+      const previousHoverState = this._isHovered
 
       this._isHovered = false
       EventHandler.trigger(this._element, this.constructor.Event.SHOWN)
 
-      if (prevHoverState) {
+      if (previousHoverState) {
         this._leave()
       }
     }
@@ -410,7 +410,7 @@ class Tooltip extends BaseComponent {
     const { offset } = this._config
 
     if (typeof offset === 'string') {
-      return offset.split(',').map(val => Number.parseInt(val, 10))
+      return offset.split(',').map(value => Number.parseInt(value, 10))
     }
 
     if (typeof offset === 'function') {
@@ -558,9 +558,9 @@ class Tooltip extends BaseComponent {
   _getConfig(config) {
     const dataAttributes = Manipulator.getDataAttributes(this._element)
 
-    for (const dataAttr of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttr)) {
-        delete dataAttributes[dataAttr]
+    for (const dataAttribute of Object.keys(dataAttributes)) {
+      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
+        delete dataAttributes[dataAttribute]
       }
     }
 
