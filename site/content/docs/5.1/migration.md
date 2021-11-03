@@ -10,6 +10,7 @@ toc: true
 ## v5.2.0
 
 - **Introduced new `$enable-container-classes` option.** Now when opting into the experimental CSS Grid layout, `.container-*` classes will still be compiled, unless this option is set to `false`.
+- **Removed unused positioning styles from popovers and tooltips** as these are handled solely by Popper.js. `$tooltip-margin` has been deprecated and set to `null` in the process.
 
 ## Dependencies
 
