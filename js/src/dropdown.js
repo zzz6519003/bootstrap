@@ -367,10 +367,6 @@ class Dropdown extends BaseComponent {
         continue
       }
 
-      const relatedTarget = {
-        relatedTarget: context._element
-      }
-
       const composedPath = event.composedPath()
       const isMenuTarget = composedPath.includes(context._menu)
       if (
@@ -385,6 +381,8 @@ class Dropdown extends BaseComponent {
       if (context._menu.contains(event.target) && ((event.type === 'keyup' && event.key === TAB_KEY) || /input|select|option|textarea|form/i.test(event.target.tagName))) {
         continue
       }
+
+      const relatedTarget = { relatedTarget: context._element }
 
       if (event.type === 'click') {
         relatedTarget.clickEvent = event
