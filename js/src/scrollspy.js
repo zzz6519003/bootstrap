@@ -87,22 +87,13 @@ class ScrollSpy extends BaseComponent {
 
   // Public
   refresh() {
-    const autoMethod = this._scrollElement === this._scrollElement.window ?
-      METHOD_OFFSET :
-      METHOD_POSITION
-
-    const offsetMethod = this._config.method === 'auto' ?
-      autoMethod :
-      this._config.method
-
-    const offsetBase = offsetMethod === METHOD_POSITION ?
-      this._getScrollTop() :
-      0
-
     this._offsets = []
     this._targets = []
     this._scrollHeight = this._getScrollHeight()
 
+    const autoMethod = this._scrollElement === this._scrollElement.window ? METHOD_OFFSET : METHOD_POSITION
+    const offsetMethod = this._config.method === 'auto' ? autoMethod : this._config.method
+    const offsetBase = offsetMethod === METHOD_POSITION ? this._getScrollTop() : 0
     const targets = SelectorEngine.find(SELECTOR_LINK_ITEMS, this._config.target)
       .map(element => {
         const targetSelector = getSelectorFromElement(element)
@@ -118,7 +109,7 @@ class ScrollSpy extends BaseComponent {
           [Manipulator[offsetMethod](target).top + offsetBase, targetSelector] :
           null
       })
-        .filter(item => item)
+        .filter(Boolean)
         .sort((a, b) => a[0] - b[0])
 
     for (const target of targets) {
@@ -191,7 +182,7 @@ class ScrollSpy extends BaseComponent {
       return
     }
 
-    for (let i = this._offsets.length; i--;) {
+    for (const i of this._offsets.keys()) {
       const isActiveTarget = this._activeTarget !== this._targets[i] &&
           scrollTop >= this._offsets[i] &&
           (typeof this._offsets[i + 1] === 'undefined' || scrollTop < this._offsets[i + 1])
