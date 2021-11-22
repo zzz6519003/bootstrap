@@ -36,17 +36,17 @@ class ScrollBarHelper {
     const width = this.getWidth()
     this._disableOverFlow()
     // give padding to element to balance the hidden scrollbar width
-    this._setElementAttributes(this._element, 'paddingRight', calculatedValue => calculatedValue + width)
-    // trick: We adjust positive paddingRight and negative marginRight to sticky-top elements to keep showing fullwidth
-    this._setElementAttributes(SELECTOR_FIXED_CONTENT, 'paddingRight', calculatedValue => calculatedValue + width)
-    this._setElementAttributes(SELECTOR_STICKY_CONTENT, 'marginRight', calculatedValue => calculatedValue - width)
+    this._setElementAttributes(this._element, 'padding-right', calculatedValue => calculatedValue + width)
+    // trick: We adjust positive padding-right and negative margin-right to sticky-top elements to keep showing fullwidth
+    this._setElementAttributes(SELECTOR_FIXED_CONTENT, 'padding-right', calculatedValue => calculatedValue + width)
+    this._setElementAttributes(SELECTOR_STICKY_CONTENT, 'margin-right', calculatedValue => calculatedValue - width)
   }
 
   reset() {
     this._resetElementAttributes(this._element, 'overflow')
-    this._resetElementAttributes(this._element, 'paddingRight')
-    this._resetElementAttributes(SELECTOR_FIXED_CONTENT, 'paddingRight')
-    this._resetElementAttributes(SELECTOR_STICKY_CONTENT, 'marginRight')
+    this._resetElementAttributes(this._element, 'padding-right')
+    this._resetElementAttributes(SELECTOR_FIXED_CONTENT, 'padding-right')
+    this._resetElementAttributes(SELECTOR_STICKY_CONTENT, 'margin-right')
   }
 
   isOverflowing() {
@@ -67,15 +67,15 @@ class ScrollBarHelper {
       }
 
       this._saveInitialAttribute(element, styleProp)
-      const calculatedValue = window.getComputedStyle(element)[styleProp]
-      element.style[styleProp] = `${callback(Number.parseFloat(calculatedValue))}px`
+      const calculatedValue = window.getComputedStyle(element).getPropertyValue(styleProp)
+      element.style.setProperty(styleProp, `${callback(Number.parseFloat(calculatedValue))}px`)
     }
 
     this._applyManipulationCallback(selector, manipulationCallBack)
   }
 
   _saveInitialAttribute(element, styleProp) {
-    const actualValue = element.style[styleProp]
+    const actualValue = element.style.getPropertyValue(styleProp)
     if (actualValue) {
       Manipulator.setDataAttribute(element, styleProp, actualValue)
     }
@@ -84,12 +84,13 @@ class ScrollBarHelper {
   _resetElementAttributes(selector, styleProp) {
     const manipulationCallBack = element => {
       const value = Manipulator.getDataAttribute(element, styleProp)
-      if (typeof value === 'undefined') {
+      if (!value) {
         element.style.removeProperty(styleProp)
-      } else {
-        Manipulator.removeDataAttribute(element, styleProp)
-        element.style[styleProp] = value
+        return
       }
+
+      Manipulator.removeDataAttribute(element, styleProp)
+      element.style.setProperty(styleProp, value)
     }
 
     this._applyManipulationCallback(selector, manipulationCallBack)

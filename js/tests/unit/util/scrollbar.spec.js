@@ -109,9 +109,9 @@ describe('ScrollBar', () => {
   describe('hide - reset', () => {
     it('should adjust the inline padding of fixed elements which are full-width', done => {
       fixtureEl.innerHTML = [
-        '<div style="height: 110vh; width: 100%">' +
-        '<div class="fixed-top" id="fixed1" style="padding-right: 0px; width: 100vw"></div>',
-        '<div class="fixed-top" id="fixed2" style="padding-right: 5px; width: 100vw"></div>',
+        '<div style="height: 110vh; width: 100%">',
+        '   <div class="fixed-top" id="fixed1" style="padding-right: 0px; width: 100vw"></div>',
+        '   <div class="fixed-top" id="fixed2" style="padding-right: 5px; width: 100vw"></div>',
         '</div>'
       ].join('')
       doc.style.overflowY = 'scroll'
@@ -143,10 +143,31 @@ describe('ScrollBar', () => {
       done()
     })
 
+    it('should remove padding & margin if not existed before adjustment', done => {
+      fixtureEl.innerHTML = [
+        '<div style="height: 110vh; width: 100%">',
+        '   <div class="fixed" id="fixed" style="width: 100vw;"></div>',
+        '   <div class="sticky-top" id="sticky" style=" width: 100vw;"></div>',
+        '</div>'
+      ].join('')
+      doc.style.overflowY = 'scroll'
+
+      const fixedEl = fixtureEl.querySelector('#fixed')
+      const stickyEl = fixtureEl.querySelector('#sticky')
+      const scrollBar = new ScrollBarHelper()
+
+      scrollBar.hide()
+      scrollBar.reset()
+
+      expect(fixedEl.getAttribute('style').includes('padding-right')).toBe(false, 'fixed element padding should be removed after closing')
+      expect(stickyEl.getAttribute('style').includes('margin-right')).toBe(false, 'sticky element margin should be removed after closing')
+      done()
+    })
+
     it('should adjust the inline margin and padding of sticky elements', done => {
       fixtureEl.innerHTML = [
-        '<div style="height: 110vh">' +
-        '<div class="sticky-top" style="margin-right: 10px; padding-right: 20px; width: 100vw; height: 10px"></div>',
+        '<div style="height: 110vh">',
+        '   <div class="sticky-top" style="margin-right: 10px; padding-right: 20px; width: 100vw; height: 10px"></div>',
         '</div>'
       ].join('')
       doc.style.overflowY = 'scroll'
