@@ -99,10 +99,11 @@ class ScrollBarHelper {
   _applyManipulationCallback(selector, callBack) {
     if (isElement(selector)) {
       callBack(selector)
-    } else {
-      for (const sel of SelectorEngine.find(selector, this._element)) {
-        callBack(sel)
-      }
+      return
+    }
+
+    for (const sel of SelectorEngine.find(selector, this._element)) {
+      callBack(sel)
     }
   }
 }
