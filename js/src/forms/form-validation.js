@@ -1,12 +1,12 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.0.1): util/form-validation.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Bootstrap (v5.1.3): util/form-validation.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 import BaseComponent from '../base-component'
 import EventHandler from '../dom/event-handler'
-import { getUID, typeCheckConfig } from '../util/index'
+import { typeCheckConfig } from '../util/index'
 import Field from './field'
 import Manipulator from '../dom/manipulator'
 import SelectorEngine from '../dom/selector-engine'
@@ -14,13 +14,12 @@ import SelectorEngine from '../dom/selector-engine'
 const NAME = 'formValidation'
 const DATA_KEY = 'bs.formValidation'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_SUBMIT = `submit${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`
+const EVENT_SUBMIT = `submit${EVENT_KEY}`
 const EVENT_RESET = `reset${EVENT_KEY}`
 
 const CLASS_VALIDATED = 'was-validated'
-const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="form-validation"]'
+const SELECTOR_DATA_TOGGLE = 'form[data-bs-toggle="form-validation"]'
 
 const Default = {
   type: 'feedback' // or 'tooltip'
@@ -40,7 +39,6 @@ class FormValidation extends BaseComponent {
     this._config = this._getConfig(config)
 
     this._addEventListeners()
-    this._formElements = [...this._element.elements] // the DOM elements
     this._formFields = null // Our fields
   }
 
@@ -57,43 +55,52 @@ class FormValidation extends BaseComponent {
   }
 
   getField(name) {
-    return this.getFields().get(name) || null
-  }
-
-  appendErrors() {
-    this.getFields().forEach(field => {
-      field.errorMessages().appendFirst()
-    })
+    return this.getFields().get(name)
   }
 
   clear() {
-    this._element.classList.remove(CLASS_VALIDATED)
-    this.getFields().forEach(field => {
+    this.toggleValidateClass(false)
+    for (const field of this.getFields()) {
       field.clearAppended()
-    })
+    }
   }
 
-  autoValidate() {
-    if (this._element.checkValidity()) {
-      this.clear()
+  toggleValidateClass(add) {
+    if (add) {
+      this._element.classList.add(CLASS_VALIDATED)
       return
     }
 
-    this.getFields().forEach(field => {
+    this._element.classList.remove(CLASS_VALIDATED)
+  }
+
+  autoValidate() {
+    this.clear()
+    if (this._element.checkValidity()) {
+      return
+    }
+
+    for (const field of this.getFields()) {
       const element = field.getElement()
       if (element.checkValidity()) {
-        field.successMessages().appendFirst()
+        field.successMessages().getFirst()?.append()
         return
       }
 
-      if (!field.errorMessages().has()) { // if hasn't custom message, try to put the default
-        field.errorMessages().add(element.validationMessage)
+      if (field.errorMessages().has('default')) {
+        field.errorMessages().get('default').append()
+        return
       }
 
-      field.errorMessages().appendFirst()
-    })
+      for (const property in element.validity) {
+        if (element.validity[property]) {
+          field.errorMessages().set(property, element.validationMessage)
+          field.errorMessages().get(property).append()
+        }
+      }
+    }
 
-    this._element.classList.add(CLASS_VALIDATED)
+    this.toggleValidateClass(true)
   }
 
   _getConfig(config) {
@@ -115,26 +122,25 @@ class FormValidation extends BaseComponent {
 
   _initializeFields() {
     const arrayFields = new Map()
-    this._formElements.forEach(element => {
-      let { id } = element
-      if (!id) {
-        id = getUID(NAME)
-        element.id = id
-      }
+    const formElements = Array.from(this._element.elements) // the DOM elements
+    for (const element of formElements) {
+      const name = element.name || element.id
 
-      const field = new Field(element, {
-        name: id,
+      const field = Field.getOrCreateInstance(element, {
+        name,
         type: this._config.type
       })
-      arrayFields.set(id, field)
-    })
+      arrayFields.set(name, field)
+    }
+
     return arrayFields
   }
 }
 
+// On submit we want to auto-validate form
 EventHandler.on(document, EVENT_SUBMIT, SELECTOR_DATA_TOGGLE, event => {
   const { target } = event
-  const data = FormValidation.getInstance(target) || new FormValidation(target)
+  const data = FormValidation.getOrCreateInstance(target)
   if (!target.checkValidity()) {
     event.preventDefault()
     event.stopPropagation()
@@ -143,10 +149,11 @@ EventHandler.on(document, EVENT_SUBMIT, SELECTOR_DATA_TOGGLE, event => {
   data.autoValidate()
 })
 
+// On load, add `novalidate` attribute to avoid browser validation
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  SelectorEngine.find(SELECTOR_DATA_TOGGLE).forEach(el => {
+  for (const el of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
     el.setAttribute('novalidate', true)
-  })
+  }
 })
 export default FormValidation
 

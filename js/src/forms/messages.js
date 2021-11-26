@@ -1,47 +1,33 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.0.1): util/messages.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Bootstrap (v5.1.3): forms/messages.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
-import Message from './message'
+import TemplateFactory from '../util/template-factory'
 
-class Messages {
-  constructor(messageConfig) {
-    this._messageConfig = messageConfig
-    this._messages = new Set()
+class Messages extends Map {
+  constructor(templateConfig) {
+    super()
+    this._templateConfig = templateConfig
   }
 
-  add(message) {
-    const config = { ...this._messageConfig, ...{ text: message } }
-    this._messages.add(new Message(config))
+  set(key, message) {
+    const config = { ...this._templateConfig, content: { div: message } }
+    super.set(key, new TemplateFactory(config))
   }
 
-  has() {
-    return this._messages.size > 0
-  }
-
-  clear() {
-    this._messages.clear()
-  }
-
-  getAll() {
-    return this._getAllMessagesAsArray().map(message => message.getText())
+  getAllAsTextArray() {
+    return Array.from(this.values()).map(message => message.getContent().join(', '))
   }
 
   getFirst() {
-    return this._getAllMessagesAsArray()[0] || null
+    const first = this.values().next()
+    return first ? first.value : null
   }
 
-  appendFirst() {
-    const message = this.getFirst()
-    if (message) {
-      message.append()
-    }
-  }
-
-  _getAllMessagesAsArray() {
-    return [...this._messages]
+  count() {
+    return this.size
   }
 }
 

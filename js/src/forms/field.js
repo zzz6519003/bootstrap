@@ -1,17 +1,27 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.0.1): util/field.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Bootstrap (v5.1.3): forms/field.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
-import { typeCheckConfig } from '../util/index'
+
+import { isElement, typeCheckConfig } from '../util/index'
 import Messages from './messages'
 import Manipulator from '../dom/manipulator'
+import EventHandler from '../dom/event-handler'
+import BaseComponent from '../base-component'
+import SelectorEngine from '../dom/selector-engine'
 
 const NAME = 'field'
+const DATA_KEY = 'bs.field'
+const EVENT_KEY = `.${DATA_KEY}`
+const EVENT_INPUT = `input${EVENT_KEY}`
 const CLASS_PREFIX_ERROR = 'invalid'
 const CLASS_PREFIX_INFO = 'info'
 const CLASS_PREFIX_SUCCESS = 'valid'
+const CLASS_FIELD_ERROR = 'is-invalid'
+const CLASS_FIELD_SUCCESS = 'is-valid'
+
 const ARIA_DESCRIBED_BY = 'aria-describedby'
 const Default = {
   name: null,
@@ -27,22 +37,27 @@ const DefaultType = {
   invalid: 'string'
 }
 
-class Field {
+class Field extends BaseComponent {
   constructor(element, config) {
-    this._element = element
-    if (!this._element) {
-      throw new TypeError(`field with id:${this._config.name} not found`)
+    super(element)
+    if (!isElement(this._element)) {
+      throw new TypeError(`field "${this._config.name}" not found`)
     }
 
     this._config = this._getConfig(config)
 
-    this._errorMessages = this._getNewMessagesCollection(CLASS_PREFIX_ERROR)
-    this._helpMessages = this._getNewMessagesCollection(CLASS_PREFIX_INFO)
-    this._successMessages = this._getNewMessagesCollection(CLASS_PREFIX_SUCCESS)
+    this._errorMessages = this._getNewMessagesCollection(CLASS_PREFIX_ERROR, CLASS_FIELD_ERROR)
+    this._helpMessages = this._getNewMessagesCollection(CLASS_PREFIX_INFO, '')
+    this._successMessages = this._getNewMessagesCollection(CLASS_PREFIX_SUCCESS, CLASS_FIELD_SUCCESS)
 
     this._initializeMessageCollections()
-    this._initialDescriptedBy = this._element.getAttribute(ARIA_DESCRIBED_BY)
-    this._appendedFeedback = null
+    EventHandler.on(this._element, EVENT_INPUT, () => {
+      this.clearAppended()
+    })
+  }
+
+  static get NAME() {
+    return NAME
   }
 
   getElement() {
@@ -50,23 +65,21 @@ class Field {
   }
 
   clearAppended() {
-    if (!this._appendedFeedback) {
+    const appendedFeedback = SelectorEngine.findOne(`[class*=-${this._config.type}], ${this._getId()}`, this._element.parentNode)
+    if (!appendedFeedback) {
       return
     }
 
-    this._appendedFeedback.remove()
-    this._appendedFeedback = null
-    if (this._initialDescriptedBy) {
-      this._element.setAttribute(ARIA_DESCRIBED_BY, this._initialDescriptedBy)
+    appendedFeedback.remove()
+
+    this._element.classList.remove(CLASS_FIELD_ERROR, CLASS_FIELD_SUCCESS)
+
+    const initialDescribedBy = this._initialDescribedBy()
+    if (initialDescribedBy) {
+      this._element.setAttribute(ARIA_DESCRIBED_BY, initialDescribedBy)
     } else {
       this._element.removeAttribute(ARIA_DESCRIBED_BY)
     }
-  }
-
-  dispose() {
-    Object.getOwnPropertyNames(this).forEach(propertyName => {
-      this[propertyName] = null
-    })
   }
 
   errorMessages() {
@@ -92,19 +105,21 @@ class Field {
     return config
   }
 
-  _appendFeedback(htmlElement) {
-    this.clearAppended()
-    if (!htmlElement) {
+  _appendFeedback(htmlElement, elementClass) {
+    if (!isElement(htmlElement)) {
       return
     }
 
+    this.clearAppended()
+
     const feedbackElement = htmlElement
 
-    this._appendedFeedback = feedbackElement
-
-    this._element.parentNode.insertBefore(feedbackElement, this._element.nextSibling)
+    this._element.parentNode.append(feedbackElement)
     feedbackElement.id = this._getId()
-    const describedBy = this._initialDescriptedBy ? `${this._initialDescriptedBy} ` : ''
+
+    this._element.classList.add(elementClass)
+    const initialDescribedBy = this._initialDescribedBy()
+    const describedBy = initialDescribedBy ? `${initialDescribedBy} ` : ''
     this._element.setAttribute(ARIA_DESCRIBED_BY, `${describedBy}${feedbackElement.id}`)
   }
 
@@ -112,22 +127,25 @@ class Field {
     return `${this._config.name}-formTip`
   }
 
-  _getNewMessagesCollection(classPrefix) {
+  _getNewMessagesCollection(classPrefix, elementClass) {
     const config = {
-      appendFunction: html => this._appendFeedback(html),
-      type: this._config.type,
-      classPrefix
+      appendFunction: html => this._appendFeedback(html, elementClass),
+      extraClass: `${classPrefix}-${this._config.type}`
     }
     return new Messages(config)
   }
 
+  _initialDescribedBy() {
+    return (this._element.getAttribute(ARIA_DESCRIBED_BY) || '').replaceAll(this._getId(), '').trim()
+  }
+
   _initializeMessageCollections() {
     if (this._config.invalid) {
-      this.errorMessages().add(this._config.invalid)
+      this.errorMessages().set('default', this._config.invalid)
     }
 
     if (this._config.valid) {
-      this.successMessages().add(this._config.valid)
+      this.successMessages().set('default', this._config.valid)
     }
   }
 }
