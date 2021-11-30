@@ -1,6 +1,4 @@
 import Popover from '../../src/popover'
-
-/** Test helpers */
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture'
 
 describe('Popover', () => {
@@ -15,9 +13,9 @@ describe('Popover', () => {
 
     const popoverList = document.querySelectorAll('.popover')
 
-    popoverList.forEach(popoverEl => {
+    for (const popoverEl of popoverList) {
       popoverEl.remove()
-    })
+    }
   })
 
   describe('VERSION', () => {
@@ -164,8 +162,8 @@ describe('Popover', () => {
       const popover = new Popover(popoverEl, {
         content: 'Popover content'
       })
-
-      const spy = spyOn(popover, 'setContent').and.callThrough()
+      expect(popover._templateFactory).toBeNull()
+      let spy = null
       let times = 1
 
       popoverEl.addEventListener('hidden.bs.popover', () => {
@@ -173,11 +171,12 @@ describe('Popover', () => {
       })
 
       popoverEl.addEventListener('shown.bs.popover', () => {
+        spy = spy || spyOn(popover._templateFactory, 'constructor').and.callThrough()
         const popoverDisplayed = document.querySelector('.popover')
 
         expect(popoverDisplayed).not.toBeNull()
         expect(popoverDisplayed.querySelector('.popover-body').textContent).toEqual('Popover content')
-        expect(spy).toHaveBeenCalledTimes(1)
+        expect(spy).toHaveBeenCalledTimes(0)
         if (times > 1) {
           done()
         }
