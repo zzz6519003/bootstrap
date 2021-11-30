@@ -1,16 +1,17 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.1.3): forms/field.js
+ * Bootstrap (v5.3.0): forms/field.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
-import { isElement, typeCheckConfig } from '../util/index'
+import { getUID, isElement, typeCheckConfig } from '../util/index'
 import Messages from './messages'
 import Manipulator from '../dom/manipulator'
 import EventHandler from '../dom/event-handler'
 import BaseComponent from '../base-component'
 import SelectorEngine from '../dom/selector-engine'
+import TemplateFactory from '../util/template-factory'
 
 const NAME = 'field'
 const DATA_KEY = 'bs.field'
@@ -45,12 +46,14 @@ class Field extends BaseComponent {
     }
 
     this._config = this._getConfig(config)
+    this._tipId = getUID(`${this._config.name}-formTip-`)
+    this._initialDescribedBy = this._element.getAttribute(ARIA_DESCRIBED_BY) || ''
 
     this._errorMessages = this._getNewMessagesCollection(CLASS_PREFIX_ERROR, CLASS_FIELD_ERROR)
     this._helpMessages = this._getNewMessagesCollection(CLASS_PREFIX_INFO, '')
     this._successMessages = this._getNewMessagesCollection(CLASS_PREFIX_SUCCESS, CLASS_FIELD_SUCCESS)
-
     this._initializeMessageCollections()
+
     EventHandler.on(this._element, EVENT_INPUT, () => {
       this.clearAppended()
     })
@@ -64,8 +67,12 @@ class Field extends BaseComponent {
     return this._element
   }
 
+  getName() {
+    return this._config.name
+  }
+
   clearAppended() {
-    const appendedFeedback = SelectorEngine.findOne(`[class*=-${this._config.type}], ${this._getId()}`, this._element.parentNode)
+    const appendedFeedback = SelectorEngine.findOne(`#${this._tipId}`, this._element.parentNode)
     if (!appendedFeedback) {
       return
     }
@@ -74,12 +81,12 @@ class Field extends BaseComponent {
 
     this._element.classList.remove(CLASS_FIELD_ERROR, CLASS_FIELD_SUCCESS)
 
-    const initialDescribedBy = this._initialDescribedBy()
-    if (initialDescribedBy) {
-      this._element.setAttribute(ARIA_DESCRIBED_BY, initialDescribedBy)
-    } else {
-      this._element.removeAttribute(ARIA_DESCRIBED_BY)
+    if (this._initialDescribedBy) {
+      this._element.setAttribute(ARIA_DESCRIBED_BY, this._initialDescribedBy)
+      return
     }
+
+    this._element.removeAttribute(ARIA_DESCRIBED_BY)
   }
 
   errorMessages() {
@@ -105,38 +112,35 @@ class Field extends BaseComponent {
     return config
   }
 
-  _appendFeedback(htmlElement, elementClass) {
-    if (!isElement(htmlElement)) {
+  appendFeedback(feedback, extraClass) {
+    if (!feedback) {
       return
     }
 
     this.clearAppended()
 
-    const feedbackElement = htmlElement
+    if (!(feedback instanceof TemplateFactory)) {
+      const config = { content: { div: feedback } }
+      feedback = new TemplateFactory(config)
+    }
+
+    const feedbackElement = feedback.toHtml()
+    feedbackElement.id = this._tipId
+    if (extraClass) {
+      feedbackElement.classList.add(extraClass)
+    }
 
     this._element.parentNode.append(feedbackElement)
-    feedbackElement.id = this._getId()
 
-    this._element.classList.add(elementClass)
-    const initialDescribedBy = this._initialDescribedBy()
-    const describedBy = initialDescribedBy ? `${initialDescribedBy} ` : ''
-    this._element.setAttribute(ARIA_DESCRIBED_BY, `${describedBy}${feedbackElement.id}`)
+    const describedBy = `${this._initialDescribedBy} ${feedbackElement.id}`.trim()
+    this._element.setAttribute(ARIA_DESCRIBED_BY, describedBy)
   }
 
-  _getId() {
-    return `${this._config.name}-formTip`
-  }
-
-  _getNewMessagesCollection(classPrefix, elementClass) {
+  _getNewMessagesCollection(classPrefix = '', elementClass = '') {
     const config = {
-      appendFunction: html => this._appendFeedback(html, elementClass),
-      extraClass: `${classPrefix}-${this._config.type}`
+      extraClass: `${classPrefix}-${this._config.type} ${elementClass}`
     }
     return new Messages(config)
-  }
-
-  _initialDescribedBy() {
-    return (this._element.getAttribute(ARIA_DESCRIBED_BY) || '').replaceAll(this._getId(), '').trim()
   }
 
   _initializeMessageCollections() {

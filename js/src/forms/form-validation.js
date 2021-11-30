@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.1.3): util/form-validation.js
+ * Bootstrap (v5.3.0): util/form-validation.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
@@ -37,9 +37,11 @@ class FormValidation extends BaseComponent {
     }
 
     this._config = this._getConfig(config)
-
-    this._addEventListeners()
     this._formFields = null // Our fields
+
+    EventHandler.on(this._element, EVENT_RESET, () => {
+      this.clear()
+    })
   }
 
   static get NAME() {
@@ -59,19 +61,11 @@ class FormValidation extends BaseComponent {
   }
 
   clear() {
-    this.toggleValidateClass(false)
-    for (const field of this.getFields()) {
+    this._element.classList.remove(CLASS_VALIDATED)
+    // eslint-disable-next-line no-unused-vars
+    for (const [name, field] of this.getFields()) {
       field.clearAppended()
     }
-  }
-
-  toggleValidateClass(add) {
-    if (add) {
-      this._element.classList.add(CLASS_VALIDATED)
-      return
-    }
-
-    this._element.classList.remove(CLASS_VALIDATED)
   }
 
   autoValidate() {
@@ -80,27 +74,36 @@ class FormValidation extends BaseComponent {
       return
     }
 
-    for (const field of this.getFields()) {
-      const element = field.getElement()
-      if (element.checkValidity()) {
-        field.successMessages().getFirst()?.append()
-        return
-      }
+    // eslint-disable-next-line no-unused-vars
+    for (const [name, field] of this.getFields()) {
+      const message = this._getFieldMessage(field)
+      field.appendFeedback(message)
+    }
 
-      if (field.errorMessages().has('default')) {
-        field.errorMessages().get('default').append()
-        return
-      }
+    this._element.classList.add(CLASS_VALIDATED)
+  }
 
-      for (const property in element.validity) {
-        if (element.validity[property]) {
-          field.errorMessages().set(property, element.validationMessage)
-          field.errorMessages().get(property).append()
-        }
+  _getFieldMessage(field) {
+    const element = field.getElement()
+
+    if (element.checkValidity()) {
+      return field.successMessages().getFirst()
+    }
+
+    if (field.errorMessages().has('default')) {
+      return field.errorMessages().get('default')
+    }
+
+    // eslint-disable-next-line no-console
+    console.log(element.validity)
+    for (const property in element.validity) {
+      if (element.validity[property]) {
+        field.errorMessages().set(property, element.validationMessage)
+        return field.errorMessages().get(property)
       }
     }
 
-    this.toggleValidateClass(true)
+    return ''
   }
 
   _getConfig(config) {
@@ -114,14 +117,8 @@ class FormValidation extends BaseComponent {
     return config
   }
 
-  _addEventListeners() {
-    EventHandler.on(this._element, EVENT_RESET, () => {
-      this.clear()
-    })
-  }
-
   _initializeFields() {
-    const arrayFields = new Map()
+    const fields = new Map()
     const formElements = Array.from(this._element.elements) // the DOM elements
     for (const element of formElements) {
       const name = element.name || element.id
@@ -130,10 +127,10 @@ class FormValidation extends BaseComponent {
         name,
         type: this._config.type
       })
-      arrayFields.set(name, field)
+      fields.set(name, field)
     }
 
-    return arrayFields
+    return fields
   }
 }
 

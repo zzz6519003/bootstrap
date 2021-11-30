@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.1.3): forms/messages.js
+ * Bootstrap (v5.3.0): forms/messages.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
@@ -15,10 +15,6 @@ class Messages extends Map {
   set(key, message) {
     const config = { ...this._templateConfig, content: { div: message } }
     super.set(key, new TemplateFactory(config))
-  }
-
-  getAllAsTextArray() {
-    return Array.from(this.values()).map(message => message.getContent().join(', '))
   }
 
   getFirst() {
