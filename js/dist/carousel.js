@@ -4,189 +4,18 @@
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./base-component.js')) :
-  typeof define === 'function' && define.amd ? define(['./dom/event-handler', './dom/manipulator', './dom/selector-engine', './base-component'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Carousel = factory(global.EventHandler, global.Manipulator, global.SelectorEngine, global.Base));
-})(this, (function (EventHandler, Manipulator, SelectorEngine, BaseComponent) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/event-handler'), require('./dom/manipulator'), require('./dom/selector-engine'), require('./util/swipe'), require('./base-component')) :
+  typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/swipe', './base-component'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Carousel = factory(global.Index, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Swipe, global.BaseComponent));
+})(this, (function (index, EventHandler, Manipulator, SelectorEngine, Swipe, BaseComponent) { 'use strict';
 
   const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
 
   const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
   const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
   const SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
+  const Swipe__default = /*#__PURE__*/_interopDefaultLegacy(Swipe);
   const BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
-
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.3): util/index.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-  const TRANSITION_END = 'transitionend'; // Shoutout AngusCroll (https://goo.gl/pxwQGp)
-
-  const toType = obj => {
-    if (obj === null || obj === undefined) {
-      return `${obj}`;
-    }
-
-    return {}.toString.call(obj).match(/\s([a-z]+)/i)[1].toLowerCase();
-  };
-
-  const getSelector = element => {
-    let selector = element.getAttribute('data-bs-target');
-
-    if (!selector || selector === '#') {
-      let hrefAttr = element.getAttribute('href'); // The only valid content that could double as a selector are IDs or classes,
-      // so everything starting with `#` or `.`. If a "real" URL is used as the selector,
-      // `document.querySelector` will rightfully complain it is invalid.
-      // See https://github.com/twbs/bootstrap/issues/32273
-
-      if (!hrefAttr || !hrefAttr.includes('#') && !hrefAttr.startsWith('.')) {
-        return null;
-      } // Just in case some CMS puts out a full URL with the anchor appended
-
-
-      if (hrefAttr.includes('#') && !hrefAttr.startsWith('#')) {
-        hrefAttr = `#${hrefAttr.split('#')[1]}`;
-      }
-
-      selector = hrefAttr && hrefAttr !== '#' ? hrefAttr.trim() : null;
-    }
-
-    return selector;
-  };
-
-  const getElementFromSelector = element => {
-    const selector = getSelector(element);
-    return selector ? document.querySelector(selector) : null;
-  };
-
-  const triggerTransitionEnd = element => {
-    element.dispatchEvent(new Event(TRANSITION_END));
-  };
-
-  const isElement = obj => {
-    if (!obj || typeof obj !== 'object') {
-      return false;
-    }
-
-    if (typeof obj.jquery !== 'undefined') {
-      obj = obj[0];
-    }
-
-    return typeof obj.nodeType !== 'undefined';
-  };
-
-  const typeCheckConfig = (componentName, config, configTypes) => {
-    Object.keys(configTypes).forEach(property => {
-      const expectedTypes = configTypes[property];
-      const value = config[property];
-      const valueType = value && isElement(value) ? 'element' : toType(value);
-
-      if (!new RegExp(expectedTypes).test(valueType)) {
-        throw new TypeError(`${componentName.toUpperCase()}: Option "${property}" provided type "${valueType}" but expected type "${expectedTypes}".`);
-      }
-    });
-  };
-
-  const isVisible = element => {
-    if (!isElement(element) || element.getClientRects().length === 0) {
-      return false;
-    }
-
-    return getComputedStyle(element).getPropertyValue('visibility') === 'visible';
-  };
-  /**
-   * Trick to restart an element's animation
-   *
-   * @param {HTMLElement} element
-   * @return void
-   *
-   * @see https://www.charistheo.io/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
-   */
-
-
-  const reflow = element => {
-    // eslint-disable-next-line no-unused-expressions
-    element.offsetHeight;
-  };
-
-  const getjQuery = () => {
-    const {
-      jQuery
-    } = window;
-
-    if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
-      return jQuery;
-    }
-
-    return null;
-  };
-
-  const DOMContentLoadedCallbacks = [];
-
-  const onDOMContentLoaded = callback => {
-    if (document.readyState === 'loading') {
-      // add listener on the first call when the document is in loading state
-      if (!DOMContentLoadedCallbacks.length) {
-        document.addEventListener('DOMContentLoaded', () => {
-          DOMContentLoadedCallbacks.forEach(callback => callback());
-        });
-      }
-
-      DOMContentLoadedCallbacks.push(callback);
-    } else {
-      callback();
-    }
-  };
-
-  const isRTL = () => document.documentElement.dir === 'rtl';
-
-  const defineJQueryPlugin = plugin => {
-    onDOMContentLoaded(() => {
-      const $ = getjQuery();
-      /* istanbul ignore if */
-
-      if ($) {
-        const name = plugin.NAME;
-        const JQUERY_NO_CONFLICT = $.fn[name];
-        $.fn[name] = plugin.jQueryInterface;
-        $.fn[name].Constructor = plugin;
-
-        $.fn[name].noConflict = () => {
-          $.fn[name] = JQUERY_NO_CONFLICT;
-          return plugin.jQueryInterface;
-        };
-      }
-    });
-  };
-  /**
-   * Return the previous/next element of a list.
-   *
-   * @param {array} list    The list of elements
-   * @param activeElement   The active element
-   * @param shouldGetNext   Choose to get next or previous element
-   * @param isCycleAllowed
-   * @return {Element|elem} The proper element
-   */
-
-
-  const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed) => {
-    let index = list.indexOf(activeElement); // if the element does not exist in the list return an element depending on the direction and if cycle is allowed
-
-    if (index === -1) {
-      return list[!shouldGetNext && isCycleAllowed ? list.length - 1 : 0];
-    }
-
-    const listLength = list.length;
-    index += shouldGetNext ? 1 : -1;
-
-    if (isCycleAllowed) {
-      index = (index + listLength) % listLength;
-    }
-
-    return list[Math.max(0, Math.min(index, listLength - 1))];
-  };
 
   /**
    * --------------------------------------------------------------------------
@@ -195,9 +24,7 @@
    * --------------------------------------------------------------------------
    */
   /**
-   * ------------------------------------------------------------------------
    * Constants
-   * ------------------------------------------------------------------------
    */
 
   const NAME = 'carousel';
@@ -208,7 +35,38 @@
   const ARROW_RIGHT_KEY = 'ArrowRight';
   const TOUCHEVENT_COMPAT_WAIT = 500; // Time for mouse compat events to fire after touch
 
-  const SWIPE_THRESHOLD = 40;
+  const ORDER_NEXT = 'next';
+  const ORDER_PREV = 'prev';
+  const DIRECTION_LEFT = 'left';
+  const DIRECTION_RIGHT = 'right';
+  const EVENT_SLIDE = `slide${EVENT_KEY}`;
+  const EVENT_SLID = `slid${EVENT_KEY}`;
+  const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
+  const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`;
+  const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`;
+  const EVENT_DRAG_START = `dragstart${EVENT_KEY}`;
+  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
+  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
+  const CLASS_NAME_CAROUSEL = 'carousel';
+  const CLASS_NAME_ACTIVE = 'active';
+  const CLASS_NAME_SLIDE = 'slide';
+  const CLASS_NAME_END = 'carousel-item-end';
+  const CLASS_NAME_START = 'carousel-item-start';
+  const CLASS_NAME_NEXT = 'carousel-item-next';
+  const CLASS_NAME_PREV = 'carousel-item-prev';
+  const SELECTOR_ACTIVE = '.active';
+  const SELECTOR_ACTIVE_ITEM = '.active.carousel-item';
+  const SELECTOR_ITEM = '.carousel-item';
+  const SELECTOR_ITEM_IMG = '.carousel-item img';
+  const SELECTOR_NEXT_PREV = '.carousel-item-next, .carousel-item-prev';
+  const SELECTOR_INDICATORS = '.carousel-indicators';
+  const SELECTOR_INDICATOR = '[data-bs-target]';
+  const SELECTOR_DATA_SLIDE = '[data-bs-slide], [data-bs-slide-to]';
+  const SELECTOR_DATA_RIDE = '[data-bs-ride="carousel"]';
+  const KEY_TO_DIRECTION = {
+    [ARROW_LEFT_KEY]: DIRECTION_RIGHT,
+    [ARROW_RIGHT_KEY]: DIRECTION_LEFT
+  };
   const Default = {
     interval: 5000,
     keyboard: true,
@@ -225,50 +83,8 @@
     wrap: 'boolean',
     touch: 'boolean'
   };
-  const ORDER_NEXT = 'next';
-  const ORDER_PREV = 'prev';
-  const DIRECTION_LEFT = 'left';
-  const DIRECTION_RIGHT = 'right';
-  const KEY_TO_DIRECTION = {
-    [ARROW_LEFT_KEY]: DIRECTION_RIGHT,
-    [ARROW_RIGHT_KEY]: DIRECTION_LEFT
-  };
-  const EVENT_SLIDE = `slide${EVENT_KEY}`;
-  const EVENT_SLID = `slid${EVENT_KEY}`;
-  const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
-  const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`;
-  const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`;
-  const EVENT_TOUCHSTART = `touchstart${EVENT_KEY}`;
-  const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY}`;
-  const EVENT_TOUCHEND = `touchend${EVENT_KEY}`;
-  const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`;
-  const EVENT_POINTERUP = `pointerup${EVENT_KEY}`;
-  const EVENT_DRAG_START = `dragstart${EVENT_KEY}`;
-  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
-  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
-  const CLASS_NAME_CAROUSEL = 'carousel';
-  const CLASS_NAME_ACTIVE = 'active';
-  const CLASS_NAME_SLIDE = 'slide';
-  const CLASS_NAME_END = 'carousel-item-end';
-  const CLASS_NAME_START = 'carousel-item-start';
-  const CLASS_NAME_NEXT = 'carousel-item-next';
-  const CLASS_NAME_PREV = 'carousel-item-prev';
-  const CLASS_NAME_POINTER_EVENT = 'pointer-event';
-  const SELECTOR_ACTIVE = '.active';
-  const SELECTOR_ACTIVE_ITEM = '.active.carousel-item';
-  const SELECTOR_ITEM = '.carousel-item';
-  const SELECTOR_ITEM_IMG = '.carousel-item img';
-  const SELECTOR_NEXT_PREV = '.carousel-item-next, .carousel-item-prev';
-  const SELECTOR_INDICATORS = '.carousel-indicators';
-  const SELECTOR_INDICATOR = '[data-bs-target]';
-  const SELECTOR_DATA_SLIDE = '[data-bs-slide], [data-bs-slide-to]';
-  const SELECTOR_DATA_RIDE = '[data-bs-ride="carousel"]';
-  const POINTER_TYPE_TOUCH = 'touch';
-  const POINTER_TYPE_PEN = 'pen';
   /**
-   * ------------------------------------------------------------------------
-   * Class Definition
-   * ------------------------------------------------------------------------
+   * Class definition
    */
 
   class Carousel extends BaseComponent__default.default {
@@ -280,12 +96,9 @@
       this._isPaused = false;
       this._isSliding = false;
       this.touchTimeout = null;
-      this.touchStartX = 0;
-      this.touchDeltaX = 0;
+      this._swipeHelper = null;
       this._config = this._getConfig(config);
       this._indicatorsElement = SelectorEngine__default.default.findOne(SELECTOR_INDICATORS, this._element);
-      this._touchSupported = 'ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0;
-      this._pointerEvent = Boolean(window.PointerEvent);
 
       this._addEventListeners();
     } // Getters
@@ -307,7 +120,7 @@
     nextWhenVisible() {
       // Don't call next when the page isn't visible
       // or the carousel or its parent isn't visible
-      if (!document.hidden && isVisible(this._element)) {
+      if (!document.hidden && index.isVisible(this._element)) {
         this.next();
       }
     }
@@ -322,7 +135,7 @@
       }
 
       if (SelectorEngine__default.default.findOne(SELECTOR_NEXT_PREV, this._element)) {
-        triggerTransitionEnd(this._element);
+        index.triggerTransitionEnd(this._element);
         this.cycle(true);
       }
 
@@ -370,6 +183,14 @@
       const order = index > activeIndex ? ORDER_NEXT : ORDER_PREV;
 
       this._slide(order, this._items[index]);
+    }
+
+    dispose() {
+      if (this._swipeHelper) {
+        this._swipeHelper.dispose();
+      }
+
+      super.dispose();
     } // Private
 
 
@@ -378,25 +199,8 @@
         ...Manipulator__default.default.getDataAttributes(this._element),
         ...(typeof config === 'object' ? config : {})
       };
-      typeCheckConfig(NAME, config, DefaultType);
+      index.typeCheckConfig(NAME, config, DefaultType);
       return config;
-    }
-
-    _handleSwipe() {
-      const absDeltax = Math.abs(this.touchDeltaX);
-
-      if (absDeltax <= SWIPE_THRESHOLD) {
-        return;
-      }
-
-      const direction = absDeltax / this.touchDeltaX;
-      this.touchDeltaX = 0;
-
-      if (!direction) {
-        return;
-      }
-
-      this._slide(direction > 0 ? DIRECTION_RIGHT : DIRECTION_LEFT);
     }
 
     _addEventListeners() {
@@ -409,68 +213,43 @@
         EventHandler__default.default.on(this._element, EVENT_MOUSELEAVE, event => this.cycle(event));
       }
 
-      if (this._config.touch && this._touchSupported) {
+      if (this._config.touch && Swipe__default.default.isSupported()) {
         this._addTouchEventListeners();
       }
     }
 
     _addTouchEventListeners() {
-      const hasPointerPenTouch = event => {
-        return this._pointerEvent && (event.pointerType === POINTER_TYPE_PEN || event.pointerType === POINTER_TYPE_TOUCH);
-      };
-
-      const start = event => {
-        if (hasPointerPenTouch(event)) {
-          this.touchStartX = event.clientX;
-        } else if (!this._pointerEvent) {
-          this.touchStartX = event.touches[0].clientX;
-        }
-      };
-
-      const move = event => {
-        // ensure swiping with one touch and not pinching
-        this.touchDeltaX = event.touches && event.touches.length > 1 ? 0 : event.touches[0].clientX - this.touchStartX;
-      };
-
-      const end = event => {
-        if (hasPointerPenTouch(event)) {
-          this.touchDeltaX = event.clientX - this.touchStartX;
-        }
-
-        this._handleSwipe();
-
-        if (this._config.pause === 'hover') {
-          // If it's a touch-enabled device, mouseenter/leave are fired as
-          // part of the mouse compatibility events on first tap - the carousel
-          // would stop cycling until user tapped out of it;
-          // here, we listen for touchend, explicitly pause the carousel
-          // (as if it's the second time we tap on it, mouseenter compat event
-          // is NOT fired) and after a timeout (to allow for mouse compatibility
-          // events to fire) we explicitly restart cycling
-          this.pause();
-
-          if (this.touchTimeout) {
-            clearTimeout(this.touchTimeout);
-          }
-
-          this.touchTimeout = setTimeout(event => this.cycle(event), TOUCHEVENT_COMPAT_WAIT + this._config.interval);
-        }
-      };
-
-      SelectorEngine__default.default.find(SELECTOR_ITEM_IMG, this._element).forEach(itemImg => {
-        EventHandler__default.default.on(itemImg, EVENT_DRAG_START, event => event.preventDefault());
-      });
-
-      if (this._pointerEvent) {
-        EventHandler__default.default.on(this._element, EVENT_POINTERDOWN, event => start(event));
-        EventHandler__default.default.on(this._element, EVENT_POINTERUP, event => end(event));
-
-        this._element.classList.add(CLASS_NAME_POINTER_EVENT);
-      } else {
-        EventHandler__default.default.on(this._element, EVENT_TOUCHSTART, event => start(event));
-        EventHandler__default.default.on(this._element, EVENT_TOUCHMOVE, event => move(event));
-        EventHandler__default.default.on(this._element, EVENT_TOUCHEND, event => end(event));
+      for (const img of SelectorEngine__default.default.find(SELECTOR_ITEM_IMG, this._element)) {
+        EventHandler__default.default.on(img, EVENT_DRAG_START, event => event.preventDefault());
       }
+
+      const endCallBack = () => {
+        if (this._config.pause !== 'hover') {
+          return;
+        } // If it's a touch-enabled device, mouseenter/leave are fired as
+        // part of the mouse compatibility events on first tap - the carousel
+        // would stop cycling until user tapped out of it;
+        // here, we listen for touchend, explicitly pause the carousel
+        // (as if it's the second time we tap on it, mouseenter compat event
+        // is NOT fired) and after a timeout (to allow for mouse compatibility
+        // events to fire) we explicitly restart cycling
+
+
+        this.pause();
+
+        if (this.touchTimeout) {
+          clearTimeout(this.touchTimeout);
+        }
+
+        this.touchTimeout = setTimeout(event => this.cycle(event), TOUCHEVENT_COMPAT_WAIT + this._config.interval);
+      };
+
+      const swipeConfig = {
+        leftCallback: () => this._slide(DIRECTION_LEFT),
+        rightCallback: () => this._slide(DIRECTION_RIGHT),
+        endCallback: endCallBack
+      };
+      this._swipeHelper = new Swipe__default.default(this._element, swipeConfig);
     }
 
     _keydown(event) {
@@ -494,7 +273,7 @@
 
     _getItemByOrder(order, activeElement) {
       const isNext = order === ORDER_NEXT;
-      return getNextActiveElement(this._items, activeElement, isNext, this._config.wrap);
+      return index.getNextActiveElement(this._items, activeElement, isNext, this._config.wrap);
     }
 
     _triggerSlideEvent(relatedTarget, eventDirectionName) {
@@ -511,18 +290,20 @@
     }
 
     _setActiveIndicatorElement(element) {
-      if (this._indicatorsElement) {
-        const activeIndicator = SelectorEngine__default.default.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
-        activeIndicator.classList.remove(CLASS_NAME_ACTIVE);
-        activeIndicator.removeAttribute('aria-current');
-        const indicators = SelectorEngine__default.default.find(SELECTOR_INDICATOR, this._indicatorsElement);
+      if (!this._indicatorsElement) {
+        return;
+      }
 
-        for (let i = 0; i < indicators.length; i++) {
-          if (Number.parseInt(indicators[i].getAttribute('data-bs-slide-to'), 10) === this._getItemIndex(element)) {
-            indicators[i].classList.add(CLASS_NAME_ACTIVE);
-            indicators[i].setAttribute('aria-current', 'true');
-            break;
-          }
+      const activeIndicator = SelectorEngine__default.default.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
+      activeIndicator.classList.remove(CLASS_NAME_ACTIVE);
+      activeIndicator.removeAttribute('aria-current');
+      const indicators = SelectorEngine__default.default.find(SELECTOR_INDICATOR, this._indicatorsElement);
+
+      for (const indicator of indicators) {
+        if (Number.parseInt(indicator.getAttribute('data-bs-slide-to'), 10) === this._getItemIndex(element)) {
+          indicator.classList.add(CLASS_NAME_ACTIVE);
+          indicator.setAttribute('aria-current', 'true');
+          break;
         }
       }
     }
@@ -603,7 +384,7 @@
 
       if (this._element.classList.contains(CLASS_NAME_SLIDE)) {
         nextElement.classList.add(orderClassName);
-        reflow(nextElement);
+        index.reflow(nextElement);
         activeElement.classList.add(directionalClassName);
         nextElement.classList.add(directionalClassName);
 
@@ -633,7 +414,7 @@
         return direction;
       }
 
-      if (isRTL()) {
+      if (index.isRTL()) {
         return direction === DIRECTION_LEFT ? ORDER_PREV : ORDER_NEXT;
       }
 
@@ -645,7 +426,7 @@
         return order;
       }
 
-      if (isRTL()) {
+      if (index.isRTL()) {
         return order === ORDER_PREV ? DIRECTION_LEFT : DIRECTION_RIGHT;
       }
 
@@ -688,7 +469,7 @@
     }
 
     static dataApiClickHandler(event) {
-      const target = getElementFromSelector(this);
+      const target = index.getElementFromSelector(this);
 
       if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {
         return;
@@ -714,9 +495,7 @@
 
   }
   /**
-   * ------------------------------------------------------------------------
-   * Data Api implementation
-   * ------------------------------------------------------------------------
+   * Data API implementation
    */
 
 
@@ -724,18 +503,15 @@
   EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
     const carousels = SelectorEngine__default.default.find(SELECTOR_DATA_RIDE);
 
-    for (let i = 0, len = carousels.length; i < len; i++) {
-      Carousel.carouselInterface(carousels[i], Carousel.getInstance(carousels[i]));
+    for (const carousel of carousels) {
+      Carousel.carouselInterface(carousel, Carousel.getInstance(carousel));
     }
   });
   /**
-   * ------------------------------------------------------------------------
    * jQuery
-   * ------------------------------------------------------------------------
-   * add .Carousel to jQuery only if jQuery is present
    */
 
-  defineJQueryPlugin(Carousel);
+  index.defineJQueryPlugin(Carousel);
 
   return Carousel;
 

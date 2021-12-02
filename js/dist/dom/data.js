@@ -17,9 +17,7 @@
    */
 
   /**
-   * ------------------------------------------------------------------------
    * Constants
-   * ------------------------------------------------------------------------
    */
   const elementMap = new Map();
   const data = {
@@ -41,11 +39,7 @@
     },
 
     get(element, key) {
-      if (elementMap.has(element)) {
-        return elementMap.get(element).get(key) || null;
-      }
-
-      return null;
+      return elementMap.has(element) ? elementMap.get(element).get(key) || null : null;
     },
 
     remove(element, key) {
