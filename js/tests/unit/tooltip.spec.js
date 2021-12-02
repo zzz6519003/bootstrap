@@ -2,6 +2,7 @@ import Tooltip from '../../src/tooltip'
 import EventHandler from '../../src/dom/event-handler'
 import { noop } from '../../src/util/index'
 import { clearFixture, createEvent, getFixture, jQueryMock } from '../helpers/fixture'
+import { getJqueryInterfaceForPlugin } from '../../src/util/jquery-stuff'
 
 describe('Tooltip', () => {
   let fixtureEl
@@ -1362,7 +1363,7 @@ describe('Tooltip', () => {
 
       const div = fixtureEl.querySelector('div')
 
-      jQueryMock.fn.tooltip = Tooltip.jQueryInterface
+      jQueryMock.fn.tooltip = getJqueryInterfaceForPlugin(Tooltip)
       jQueryMock.elements = [div]
 
       jQueryMock.fn.tooltip.call(jQueryMock)
@@ -1376,7 +1377,7 @@ describe('Tooltip', () => {
       const div = fixtureEl.querySelector('div')
       const tooltip = new Tooltip(div)
 
-      jQueryMock.fn.tooltip = Tooltip.jQueryInterface
+      jQueryMock.fn.tooltip = getJqueryInterfaceForPlugin(Tooltip)
       jQueryMock.elements = [div]
 
       jQueryMock.fn.tooltip.call(jQueryMock)
@@ -1392,7 +1393,7 @@ describe('Tooltip', () => {
 
       spyOn(tooltip, 'show')
 
-      jQueryMock.fn.tooltip = Tooltip.jQueryInterface
+      jQueryMock.fn.tooltip = getJqueryInterfaceForPlugin(Tooltip)
       jQueryMock.elements = [div]
 
       jQueryMock.fn.tooltip.call(jQueryMock, 'show')
@@ -1407,7 +1408,7 @@ describe('Tooltip', () => {
       const div = fixtureEl.querySelector('div')
       const action = 'undefinedMethod'
 
-      jQueryMock.fn.tooltip = Tooltip.jQueryInterface
+      jQueryMock.fn.tooltip = getJqueryInterfaceForPlugin(Tooltip)
       jQueryMock.elements = [div]
 
       expect(() => {

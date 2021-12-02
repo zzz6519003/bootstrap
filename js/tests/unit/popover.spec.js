@@ -1,5 +1,6 @@
 import Popover from '../../src/popover'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture'
+import { getJqueryInterfaceForPlugin } from '../../src/util/jquery-stuff'
 
 describe('Popover', () => {
   let fixtureEl
@@ -246,7 +247,7 @@ describe('Popover', () => {
 
       const popoverEl = fixtureEl.querySelector('a')
 
-      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.fn.popover = getJqueryInterfaceForPlugin(Popover)
       jQueryMock.elements = [popoverEl]
 
       jQueryMock.fn.popover.call(jQueryMock)
@@ -259,7 +260,7 @@ describe('Popover', () => {
 
       const popoverEl = fixtureEl.querySelector('a')
 
-      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.fn.popover = getJqueryInterfaceForPlugin(Popover)
       jQueryMock.elements = [popoverEl]
 
       jQueryMock.fn.popover.call(jQueryMock, {
@@ -275,7 +276,7 @@ describe('Popover', () => {
       const popoverEl = fixtureEl.querySelector('a')
       const popover = new Popover(popoverEl)
 
-      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.fn.popover = getJqueryInterfaceForPlugin(Popover)
       jQueryMock.elements = [popoverEl]
 
       jQueryMock.fn.popover.call(jQueryMock)
@@ -289,7 +290,7 @@ describe('Popover', () => {
       const popoverEl = fixtureEl.querySelector('a')
       const action = 'undefinedMethod'
 
-      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.fn.popover = getJqueryInterfaceForPlugin(Popover)
       jQueryMock.elements = [popoverEl]
 
       expect(() => {
@@ -303,7 +304,7 @@ describe('Popover', () => {
       const popoverEl = fixtureEl.querySelector('a')
       const popover = new Popover(popoverEl)
 
-      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.fn.popover = getJqueryInterfaceForPlugin(Popover)
       jQueryMock.elements = [popoverEl]
 
       spyOn(popover, 'show')

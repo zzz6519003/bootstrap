@@ -1,6 +1,7 @@
 import Collapse from '../../src/collapse'
 import EventHandler from '../../src/dom/event-handler'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture'
+import { getJqueryInterfaceForPlugin } from '../../src/util/jquery-stuff'
 
 describe('Collapse', () => {
   let fixtureEl
@@ -909,7 +910,7 @@ describe('Collapse', () => {
 
       const div = fixtureEl.querySelector('div')
 
-      jQueryMock.fn.collapse = Collapse.jQueryInterface
+      jQueryMock.fn.collapse = getJqueryInterfaceForPlugin(Collapse)
       jQueryMock.elements = [div]
 
       jQueryMock.fn.collapse.call(jQueryMock)
@@ -923,7 +924,7 @@ describe('Collapse', () => {
       const div = fixtureEl.querySelector('div')
       const collapse = new Collapse(div)
 
-      jQueryMock.fn.collapse = Collapse.jQueryInterface
+      jQueryMock.fn.collapse = getJqueryInterfaceForPlugin(Collapse)
       jQueryMock.elements = [div]
 
       jQueryMock.fn.collapse.call(jQueryMock)
@@ -937,7 +938,7 @@ describe('Collapse', () => {
       const div = fixtureEl.querySelector('div')
       const action = 'undefinedMethod'
 
-      jQueryMock.fn.collapse = Collapse.jQueryInterface
+      jQueryMock.fn.collapse = getJqueryInterfaceForPlugin(Collapse)
       jQueryMock.elements = [div]
 
       expect(() => {
