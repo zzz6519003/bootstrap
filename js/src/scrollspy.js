@@ -8,6 +8,7 @@
 import {
   defineJQueryPlugin,
   getElement,
+  isDisabled,
   typeCheckConfig
 } from './util/index'
 import EventHandler from './dom/event-handler'
@@ -80,7 +81,7 @@ class ScrollSpy extends BaseComponent {
   refresh() {
     this._targetLinks = SelectorEngine
       .find('[href]', this._config.target)// `${SELECTOR_NAV_LINKS}, ${SELECTOR_LIST_ITEMS}, .${CLASS_NAME_DROPDOWN_ITEM}`
-      .filter(el => el.hash.length > 0)// ensure that all have id
+      .filter(el => el.hash.length > 0 || isDisabled(el))// ensure that all have id and not disabled
 
     this._observableSections = this._targetLinks
       .map(el => SelectorEngine.findOne(el.hash, this._element))
