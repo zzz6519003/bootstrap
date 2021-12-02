@@ -24,6 +24,7 @@ const NAME = 'scrollspy'
 const DATA_KEY = 'bs.scrollspy'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
+const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_ACTIVATE = `activate${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
@@ -41,12 +42,14 @@ const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle'
 const Default = {
   offset: null, // @deprecated, only for backwards Compatibility reasons
   rootMargin: '0px 0px -40%',
+  smoothScroll: false,
   target: null
 }
 
 const DefaultType = {
   offset: '(number|null)', // @deprecated, only for backwards Compatibility reasons
   rootMargin: 'string',
+  smoothScroll: 'boolean',
   target: 'element'
 }
 
@@ -85,7 +88,9 @@ class ScrollSpy extends BaseComponent {
 
     this._observableSections = this._targetLinks
       .map(el => SelectorEngine.findOne(el.hash, this._element))
-      .filter(el => el)// filter nulls
+      .filter(Boolean)// filter nulls
+
+    this._mayEnableSmoothScroll()
 
     if (this._observer) {
       this._observer.disconnect()
@@ -95,6 +100,21 @@ class ScrollSpy extends BaseComponent {
 
     for (const section of this._observableSections) {
       this._observer.observe(section)
+    }
+  }
+
+  _mayEnableSmoothScroll() {
+    if (!this._config.smoothScroll) {
+      return
+    }
+
+    for (const anchor of this._targetLinks) {
+      EventHandler.off(anchor, EVENT_CLICK) // deregister any previous listeners
+      EventHandler.on(anchor, EVENT_CLICK, event => {
+        event.preventDefault()
+        const el = this._observableSections.find(el => `#${el.id}` === anchor.hash)
+        this._element.scrollTo({ top: el.offsetTop, behavior: 'smooth' })
+      })
     }
   }
 
