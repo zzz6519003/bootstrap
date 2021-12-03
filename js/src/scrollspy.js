@@ -6,7 +6,6 @@
  */
 
 import {
-  defineJQueryPlugin,
   getElement,
   getSelectorFromElement,
   typeCheckConfig
@@ -15,6 +14,7 @@ import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
 import BaseComponent from './base-component'
+import { defineJQueryPlugin } from './util/jquery-stuff'
 
 /**
  * Constants

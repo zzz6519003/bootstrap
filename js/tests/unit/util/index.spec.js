@@ -576,32 +576,6 @@ describe('Util', () => {
     })
   })
 
-  describe('defineJQueryPlugin', () => {
-    const fakejQuery = { fn: {} }
-
-    beforeEach(() => {
-      Object.defineProperty(window, 'jQuery', {
-        value: fakejQuery,
-        writable: true
-      })
-    })
-
-    afterEach(() => {
-      window.jQuery = undefined
-    })
-
-    it('should define a plugin on the jQuery instance', () => {
-      const pluginMock = function () {}
-      pluginMock.NAME = 'test'
-      pluginMock.jQueryInterface = function () {}
-
-      Util.defineJQueryPlugin(pluginMock)
-      expect(fakejQuery.fn.test).toEqual(pluginMock.jQueryInterface)
-      expect(fakejQuery.fn.test.Constructor).toEqual(pluginMock)
-      expect(fakejQuery.fn.test.noConflict).toEqual(jasmine.any(Function))
-    })
-  })
-
   describe('execute', () => {
     it('should execute if arg is function', () => {
       const spy = jasmine.createSpy('spy')
