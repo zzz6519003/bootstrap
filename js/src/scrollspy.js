@@ -5,12 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-  defineJQueryPlugin,
-  getElement,
-  isDisabled,
-  typeCheckConfig
-} from './util/index'
+import { defineJQueryPlugin, getElement, isDisabled, typeCheckConfig } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
@@ -83,8 +78,8 @@ class ScrollSpy extends BaseComponent {
   // Public
   refresh() {
     this._targetLinks = SelectorEngine
-      .find('[href]', this._config.target)// `${SELECTOR_NAV_LINKS}, ${SELECTOR_LIST_ITEMS}, .${CLASS_NAME_DROPDOWN_ITEM}`
-      .filter(el => el.hash.length > 0 || isDisabled(el))// ensure that all have id and not disabled
+      .find('[href]', this._config.target) // `${SELECTOR_NAV_LINKS}, ${SELECTOR_LIST_ITEMS}, .${CLASS_NAME_DROPDOWN_ITEM}`
+      .filter(el => el.hash.length > 0 || isDisabled(el)) // ensure that all have id and not disabled
 
     this._observableSections = this._targetLinks
       .map(el => SelectorEngine.findOne(el.hash, this._element))
@@ -100,21 +95,6 @@ class ScrollSpy extends BaseComponent {
 
     for (const section of this._observableSections) {
       this._observer.observe(section)
-    }
-  }
-
-  _mayEnableSmoothScroll() {
-    if (!this._config.smoothScroll) {
-      return
-    }
-
-    for (const anchor of this._targetLinks) {
-      EventHandler.off(anchor, EVENT_CLICK) // deregister any previous listeners
-      EventHandler.on(anchor, EVENT_CLICK, event => {
-        event.preventDefault()
-        const el = this._observableSections.find(el => `#${el.id}` === anchor.hash)
-        this._element.scrollTo({ top: el.offsetTop, behavior: 'smooth' })
-      })
     }
   }
 
@@ -138,6 +118,21 @@ class ScrollSpy extends BaseComponent {
     return config
   }
 
+  _mayEnableSmoothScroll() {
+    if (!this._config.smoothScroll) {
+      return
+    }
+
+    for (const anchor of this._targetLinks) {
+      EventHandler.off(anchor, EVENT_CLICK) // unregister any previous listeners
+      EventHandler.on(anchor, EVENT_CLICK, event => {
+        event.preventDefault()
+        const el = this._observableSections.find(el => `#${el.id}` === anchor.hash)
+        this._element.scrollTo({ top: el.offsetTop, behavior: 'smooth' })
+      })
+    }
+  }
+
   _process(target) {
     if (this._activeTarget === target) {
       return
@@ -152,7 +147,8 @@ class ScrollSpy extends BaseComponent {
 
     target.classList.add(CLASS_NAME_ACTIVE)
 
-    if (target.classList.contains(CLASS_NAME_DROPDOWN_ITEM)) { // Activate dropdown parents
+    // Activate dropdown parents
+    if (target.classList.contains(CLASS_NAME_DROPDOWN_ITEM)) {
       SelectorEngine.findOne(SELECTOR_DROPDOWN_TOGGLE, target.closest(SELECTOR_DROPDOWN))
         .classList.add(CLASS_NAME_ACTIVE)
     } else {
@@ -208,12 +204,14 @@ class ScrollSpy extends BaseComponent {
           previousIntersectionRatio = entry.intersectionRatio
           const userScrollsDown = parentScrollTop >= previousParentScrollTop
 
-          if (userScrollsDown && offsetTop >= previousVisibleEntryTop) { // if we are scrolling down, pick the bigger offsetTop
+          // if we are scrolling down, pick the bigger offsetTop
+          if (userScrollsDown && offsetTop >= previousVisibleEntryTop) {
             activate(entry)
             continue
           }
 
-          if (!userScrollsDown && offsetTop < previousVisibleEntryTop) { // if we are scrolling up, pick the smallest offsetTop
+          // if we are scrolling up, pick the smallest offsetTop
+          if (!userScrollsDown && offsetTop < previousVisibleEntryTop) {
             activate(entry)
           }
 
@@ -236,10 +234,9 @@ class ScrollSpy extends BaseComponent {
     return new IntersectionObserver(callback.bind(this), options)
   }
 
-  _getRootMargin() { // Only for backwards compatibility reasons. Use rootMargin only
-    const { offset, rootMargin } = this._config
-
-    return offset ? `${offset}px 0px 0px` : rootMargin
+  // Only for backwards compatibility reasons. Use rootMargin only
+  _getRootMargin() {
+    return this._config.offset ? `${this._config.offset}px 0px 0px` : this._config.rootMargin
   }
 
   // Static
