@@ -35,14 +35,14 @@ const SELECTOR_DROPDOWN = '.dropdown'
 const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle'
 
 const Default = {
-  offset: null, // @deprecated, only for backwards Compatibility reasons
+  offset: null, // @deprecated, keep it for backwards compatibility reasons
   rootMargin: '0px 0px -40%',
   smoothScroll: false,
   target: null
 }
 
 const DefaultType = {
-  offset: '(number|null)', // @deprecated, only for backwards Compatibility reasons
+  offset: '(number|null)', // @deprecated, keep it for backwards compatibility reasons
   rootMargin: 'string',
   smoothScroll: 'boolean',
   target: 'element'
@@ -83,9 +83,9 @@ class ScrollSpy extends BaseComponent {
 
     this._observableSections = this._targetLinks
       .map(el => SelectorEngine.findOne(el.hash, this._element))
-      .filter(Boolean)// filter nulls
+      .filter(Boolean)
 
-    this._mayEnableSmoothScroll()
+    this._maybeEnableSmoothScroll()
 
     if (this._observer) {
       this._observer.disconnect()
@@ -118,7 +118,7 @@ class ScrollSpy extends BaseComponent {
     return config
   }
 
-  _mayEnableSmoothScroll() {
+  _maybeEnableSmoothScroll() {
     if (!this._config.smoothScroll) {
       return
     }
