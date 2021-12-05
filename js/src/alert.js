@@ -28,10 +28,7 @@ const CLASS_NAME_SHOW = 'show'
  */
 
 class Alert extends BaseComponent {
-  // Getters
-  static get NAME() {
-    return NAME
-  }
+  static _NAME = NAME
 
   // Public
   close() {

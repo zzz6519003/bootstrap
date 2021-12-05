@@ -93,6 +93,7 @@ const DefaultType = {
  */
 
 class Carousel extends BaseComponent {
+  static _NAME = NAME
   static _configDefaultType = DefaultType
 
   constructor(element, config) {
@@ -113,10 +114,6 @@ class Carousel extends BaseComponent {
   // Getters
   static get Default() {
     return Default
-  }
-
-  static get NAME() {
-    return NAME
   }
 
   // Public

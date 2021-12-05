@@ -48,10 +48,7 @@ const SELECTOR_DROPDOWN_ACTIVE_CHILD = ':scope > .dropdown-menu .active'
  */
 
 class Tab extends BaseComponent {
-  // Getters
-  static get NAME() {
-    return NAME
-  }
+  static _NAME = NAME
 
   // Public
   show() {

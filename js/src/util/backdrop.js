@@ -39,6 +39,7 @@ const DefaultType = {
  */
 
 class Backdrop extends Config {
+  static _NAME = NAME
   static _configDefaultType = DefaultType
 
   constructor(config) {
@@ -46,10 +47,6 @@ class Backdrop extends Config {
     this._config = this._getConfig(config)
     this._isAppended = false
     this._element = null
-  }
-
-  static get NAME() {
-    return NAME
   }
 
   static get Default() {

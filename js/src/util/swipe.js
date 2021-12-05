@@ -42,6 +42,7 @@ const DefaultType = {
  */
 
 class Swipe extends Config {
+  static _NAME = NAME
   static _configDefaultType = DefaultType
 
   constructor(element, config) {
@@ -56,10 +57,6 @@ class Swipe extends Config {
     this._deltaX = 0
     this._supportPointerEvents = Boolean(window.PointerEvent)
     this._initEvents()
-  }
-
-  static get NAME() {
-    return NAME
   }
 
   static get Default() {

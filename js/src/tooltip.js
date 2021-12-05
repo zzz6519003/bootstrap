@@ -6,14 +6,7 @@
  */
 
 import * as Popper from '@popperjs/core'
-import {
-  defineJQueryPlugin,
-  findShadowRoot,
-  getElement,
-  getUID,
-  isRTL,
-  noop
-} from './util/index'
+import { defineJQueryPlugin, findShadowRoot, getElement, getUID, isRTL, noop } from './util/index'
 import { DefaultAllowlist } from './util/sanitizer'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
@@ -112,6 +105,7 @@ const Event = {
  */
 
 class Tooltip extends BaseComponent {
+  static _NAME = NAME
   static _configDefaultType = DefaultType
 
   constructor(element, config) {
@@ -141,14 +135,12 @@ class Tooltip extends BaseComponent {
     return Default
   }
 
-  static get NAME() {
-    return NAME
-  }
-
   static get Event() {
     return Event
   }
+
   // Public
+
   enable() {
     this._isEnabled = true
   }

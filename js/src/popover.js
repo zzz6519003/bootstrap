@@ -55,15 +55,12 @@ const Event = {
  */
 
 class Popover extends Tooltip {
+  static _NAME = NAME
   static _configDefaultType = DefaultType
 
   // Getters
   static get Default() {
     return Default
-  }
-
-  static get NAME() {
-    return NAME
   }
 
   static get Event() {

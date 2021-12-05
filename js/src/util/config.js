@@ -10,9 +10,14 @@ import Manipulator from '../dom/manipulator'
 
 class Config {
   static _configDefaultType = {}
+  static _NAME = null
 
   static get NAME() {
-    throw new Error('You have to implement the static method "NAME", for each component!')
+    if (!this._NAME) {
+      throw new Error('You have to implement the static method "NAME", for each component!')
+    }
+
+    return this._NAME
   }
 
   static get Default() {

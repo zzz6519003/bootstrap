@@ -60,6 +60,7 @@ const DefaultType = {
  */
 
 class ScrollSpy extends BaseComponent {
+  static _NAME = NAME
   static _configDefaultType = DefaultType
 
   constructor(element, config) {
@@ -79,10 +80,6 @@ class ScrollSpy extends BaseComponent {
   // Getters
   static get Default() {
     return Default
-  }
-
-  static get NAME() {
-    return NAME
   }
 
   // Public

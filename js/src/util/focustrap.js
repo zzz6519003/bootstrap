@@ -38,6 +38,7 @@ const DefaultType = {
  */
 
 class FocusTrap extends Config {
+  static _NAME = NAME
   static _configDefaultType = DefaultType
 
   constructor(config) {
@@ -45,10 +46,6 @@ class FocusTrap extends Config {
     this._config = this._getConfig(config)
     this._isActive = false
     this._lastTabNavDirection = null
-  }
-
-  static get NAME() {
-    return NAME
   }
 
   static get Default() {

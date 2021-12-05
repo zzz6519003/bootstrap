@@ -60,6 +60,7 @@ const DefaultType = {
  */
 
 class Offcanvas extends BaseComponent {
+  static _NAME = NAME
   static _configDefaultType = DefaultType
 
   constructor(element, config) {
@@ -72,9 +73,6 @@ class Offcanvas extends BaseComponent {
   }
 
   // Getters
-  static get NAME() {
-    return NAME
-  }
 
   static get Default() {
     return Default
