@@ -39,6 +39,8 @@ const DefaultType = {
  */
 
 class Backdrop extends Config {
+  static _configDefaultType = DefaultType
+
   constructor(config) {
     super()
     this._config = this._getConfig(config)
@@ -112,10 +114,6 @@ class Backdrop extends Config {
     }
 
     return this._element
-  }
-
-  _getConfigDefaultType() {
-    return DefaultType
   }
 
   _configAfterMerge(config) {

@@ -28,7 +28,7 @@ describe('Dropdown', () => {
 
   describe('DefaultType', () => {
     it('should return plugin default type config', () => {
-      expect(Dropdown.DefaultType).toEqual(jasmine.any(Object))
+      expect(Dropdown._configDefaultType).toEqual(jasmine.any(Object))
     })
   })
 

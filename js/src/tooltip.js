@@ -112,6 +112,8 @@ const Event = {
  */
 
 class Tooltip extends BaseComponent {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     if (typeof Popper === 'undefined') {
       throw new TypeError('Bootstrap\'s tooltips require Popper (https://popper.js.org)')
@@ -146,11 +148,6 @@ class Tooltip extends BaseComponent {
   static get Event() {
     return Event
   }
-
-  static get DefaultType() {
-    return DefaultType
-  }
-
   // Public
   enable() {
     this._isEnabled = true

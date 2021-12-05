@@ -56,7 +56,7 @@ describe('Tooltip', () => {
 
   describe('DefaultType', () => {
     it('should return plugin default type', () => {
-      expect(Tooltip.DefaultType).toEqual(jasmine.any(Object))
+      expect(Tooltip._configDefaultType).toEqual(jasmine.any(Object))
     })
   })
 

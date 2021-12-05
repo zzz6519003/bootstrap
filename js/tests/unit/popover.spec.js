@@ -56,7 +56,7 @@ describe('Popover', () => {
 
   describe('DefaultType', () => {
     it('should return plugin default type', () => {
-      expect(Popover.DefaultType).toEqual(jasmine.any(Object))
+      expect(Popover._configDefaultType).toEqual(jasmine.any(Object))
     })
   })
 

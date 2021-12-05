@@ -93,6 +93,8 @@ const DefaultType = {
  */
 
 class Carousel extends BaseComponent {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     super(element, config)
 
@@ -203,10 +205,6 @@ class Carousel extends BaseComponent {
   }
 
   // Private
-
-  _getConfigDefaultType() {
-    return DefaultType
-  }
 
   _addEventListeners() {
     if (this._config.keyboard) {

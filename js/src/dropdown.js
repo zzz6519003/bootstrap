@@ -86,6 +86,8 @@ const DefaultType = {
  */
 
 class Dropdown extends BaseComponent {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     super(element, config)
 
@@ -97,10 +99,6 @@ class Dropdown extends BaseComponent {
   // Getters
   static get Default() {
     return Default
-  }
-
-  static get DefaultType() {
-    return DefaultType
   }
 
   static get NAME() {

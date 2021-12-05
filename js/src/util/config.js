@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.0.2): util/config.js
+ * Bootstrap (v5.2.0): util/config.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * --------------------------------------------------------------------------
  */
@@ -9,16 +9,14 @@ import { isElement, toType } from './index'
 import Manipulator from '../dom/manipulator'
 
 class Config {
+  static _configDefaultType = {}
+
   static get NAME() {
     throw new Error('You have to implement the static method "NAME", for each component!')
   }
 
   static get Default() {
     return {}
-  }
-
-  _getConfigDefaultType() {
-    return this.constructor.DefaultType || {}
   }
 
   _getConfig(config) {
@@ -40,7 +38,7 @@ class Config {
     }
   }
 
-  _typeCheckConfig(config, configTypes = this._getConfigDefaultType()) {
+  _typeCheckConfig(config, configTypes = this.constructor._configDefaultType) {
     for (const property of Object.keys(configTypes)) {
       const expectedTypes = configTypes[property]
       const value = config[property]

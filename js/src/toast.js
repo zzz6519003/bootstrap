@@ -52,6 +52,8 @@ const Default = {
  */
 
 class Toast extends BaseComponent {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     super(element, config)
 
@@ -62,10 +64,6 @@ class Toast extends BaseComponent {
   }
 
   // Getters
-  static get DefaultType() {
-    return DefaultType
-  }
-
   static get Default() {
     return Default
   }

@@ -59,6 +59,8 @@ const DefaultType = {
  */
 
 class Collapse extends BaseComponent {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     super(element, config)
 
@@ -207,11 +209,6 @@ class Collapse extends BaseComponent {
   }
 
   // Private
-
-  _getConfigDefaultType() {
-    return DefaultType
-  }
-
   _configAfterMerge(config) {
     config.toggle = Boolean(config.toggle) // Coerce string values
     config.parent = getElement(config.parent)

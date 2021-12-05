@@ -61,6 +61,8 @@ const DefaultType = {
  */
 
 class Modal extends BaseComponent {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     super(element, config)
 
@@ -158,10 +160,6 @@ class Modal extends BaseComponent {
       isVisible: Boolean(this._config.backdrop), // 'static' option will be translated to true, and booleans will keep their value
       isAnimated: this._isAnimated()
     })
-  }
-
-  _getConfigDefaultType() {
-    return DefaultType
   }
 
   _initializeFocusTrap() {

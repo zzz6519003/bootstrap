@@ -60,6 +60,8 @@ const DefaultType = {
  */
 
 class Offcanvas extends BaseComponent {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     super(element, config)
 
@@ -159,11 +161,6 @@ class Offcanvas extends BaseComponent {
   }
 
   // Private
-
-  _getConfigDefaultType() {
-    return DefaultType
-  }
-
   _initializeBackDrop() {
     return new Backdrop({
       className: CLASS_NAME_BACKDROP,

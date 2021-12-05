@@ -60,6 +60,8 @@ const DefaultType = {
  */
 
 class ScrollSpy extends BaseComponent {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     super(element, config)
     this._scrollElement = this._element.tagName === 'BODY' ? window : this._element
@@ -133,10 +135,6 @@ class ScrollSpy extends BaseComponent {
   }
 
   // Private
-  _getConfigDefaultType() {
-    return DefaultType
-  }
-
   _configAfterMerge(config) {
     config.target = getElement(config.target) || document.documentElement
 

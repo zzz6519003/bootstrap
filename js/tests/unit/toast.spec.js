@@ -106,7 +106,7 @@ describe('Toast', () => {
 
   describe('DefaultType', () => {
     it('should expose default setting types for read', () => {
-      expect(Toast.DefaultType).toEqual(jasmine.any(Object))
+      expect(Toast._configDefaultType).toEqual(jasmine.any(Object))
     })
   })
 

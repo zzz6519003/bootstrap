@@ -38,6 +38,8 @@ const DefaultType = {
  */
 
 class FocusTrap extends Config {
+  static _configDefaultType = DefaultType
+
   constructor(config) {
     super()
     this._config = this._getConfig(config)
@@ -107,10 +109,6 @@ class FocusTrap extends Config {
     }
 
     this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD
-  }
-
-  _getConfigDefaultType() {
-    return DefaultType
   }
 }
 

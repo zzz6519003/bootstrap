@@ -42,6 +42,8 @@ const DefaultType = {
  */
 
 class Swipe extends Config {
+  static _configDefaultType = DefaultType
+
   constructor(element, config) {
     super()
     this._element = element
@@ -70,10 +72,6 @@ class Swipe extends Config {
   }
 
   // Private
-  _getConfigDefaultType() {
-    return DefaultType
-  }
-
   _start(event) {
     if (!this._supportPointerEvents) {
       this._deltaX = event.touches[0].clientX
